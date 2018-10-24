@@ -328,8 +328,6 @@ revoke all privileges on function refresh_token() from public;
 -- end;
 -- $$;
 
-alter database aula2 set "app.jwt_secret" to 'sh3d3SeWWQTn85sDZ8ytKmtS36HJtEhJ';
-
 create policy school_admin_users on aula.users using (aula.is_admin(school_id)) with check (aula.is_admin(school_id));
 create policy school_admin_school on aula.school using (aula.is_admin(id)) with check (aula.is_admin(id));
 create policy school_admin_idea_space on aula.idea_space using (aula.is_admin(school_id)) with check (aula.is_admin(school_id));
@@ -371,7 +369,6 @@ alter table aula.delegation enable row level security;
 alter table aula_secure.user_login enable row level security;
 
 create role aula_authenticator nologin;
-grant aula_authenticator to aivuk;
 grant usage on schema aula to aula_authenticator;
 grant all on all tables in schema aula to aula_authenticator;
 grant usage, select on all sequences in schema aula to aula_authenticator;
@@ -387,4 +384,10 @@ grant execute on function aula.logout() to aula_authenticator;
 grant execute on function aula.refresh_token() to aula_authenticator;
 grant execute on function aula.change_password(bigint, text) to aula_authenticator;
 grant execute on function aula.config(bigint, text, text) to aula_authenticator;
+
+-- You need to put the right user in the line below instead of 'aivuk'
+grant aula_authenticator to aivuk;
+-- Correct the database and set the JWT secret below
+alter database aula2 set "app.jwt_secret" to 'sh3d3SeWWQTn85sDZ8ytKmtS36HJtEhJ';
+
 

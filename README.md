@@ -22,3 +22,7 @@
  $ psql aula -f permissions.sql
 
 7. Edit aula.conf accoring to your database name, user, password and jwt secret (the same used on permissions)
+
+8. Start postgrest using your configuration file:
+ 
+ $ postgrest aula.conf

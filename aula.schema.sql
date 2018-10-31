@@ -53,7 +53,8 @@ create table if not exists aula.idea_space (
     changed_by  bigint      not null references aula.users (id),
     changed_at  timestamptz not null default now(),
     title       text        not null,
-    description text        not null
+    description text        not null,
+    slug        text
 );
 
 create type aula.phase as enum

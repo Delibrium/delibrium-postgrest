@@ -1,4 +1,4 @@
-drop function aula_secure.change_password(bigint, text);
+drop function  if exists aula_secure.change_password(bigint, text);
 create or replace function aula_secure.change_password(user_id bigint, new_password text)
    returns void
    language plpgsql
@@ -18,7 +18,7 @@ declare
  end
 $$;
 
-drop function aula.change_password(bigint, text);
+drop function if exists aula.change_password(bigint, text);
 create or replace function aula.change_password(user_id bigint, password text)
    returns void
    language plpgsql
@@ -29,7 +29,7 @@ as $$
  end
 $$;
 
-drop function aula.config_update(bigint, text, text);
+drop function if exists aula.config_update(bigint, text, text);
 create or replace function aula.config_update(space_id bigint, key text, value text)
   returns void
   language plpgsql
@@ -39,7 +39,7 @@ as $$
   end
 $$;
 
-drop function aula.config(bigint);
+drop function if exists aula.config(bigint);
 create or replace function aula.config(space_id bigint)
   returns json
   language plpgsql
@@ -158,7 +158,7 @@ create trigger encrypt_pass
   for each row
   execute procedure aula_secure.encrypt_pass();
 
-drop function aula_secure.user_id(text,text);
+drop function if exists aula_secure.user_id(text,text);
 create or replace function
 aula_secure.user_id(in username text, in password text)
   returns table (uid bigint, sc integer)
@@ -180,7 +180,7 @@ CREATE TYPE aula_secure.jwt_token AS (
 
 create language plpython3u;
 
-drop function aula.logout();
+drop function if exists aula.logout();
 create or replace function aula.logout()
   returns void
   language plpython3u
@@ -195,7 +195,7 @@ as $$
 
 $$;
 
-drop function aula.login(text, text);
+drop function if exists aula.login(text, text);
 create or replace function aula.login(username text, password text)
   returns json
   language plpython3u
@@ -270,7 +270,7 @@ end
 $$ stable security definer language plpgsql;
 
 -- by default all functions are accessible to the public, we need to remove that and define our specific access rules
-revoke all privileges on function refresh_token() from public;
+revoke all privileges on function aula.refresh_token() from public;
 
 -- drop function aula.login(text,text);
 -- create or replace function
@@ -341,7 +341,7 @@ create policy school_admin_comment_vote on aula.comment_vote using (aula.is_admi
 create policy school_admin_school_class on aula.school_class using (aula.is_admin(school_id)) with check (aula.is_admin(school_id));
 create policy school_admin_user_group on aula.user_group using (aula.is_admin(school_id)) with check (aula.is_admin(school_id));
 create policy school_admin_delegation on aula.delegation using (aula.is_admin(school_id)) with check (aula.is_admin(school_id));
-drop policy user_login on aula_secure.user_login ;
+drop policy if exists user_login on aula_secure.user_login ;
 create policy user_login on aula_secure.user_login using (aula.is_admin(school_id) or aula.is_owner(aula_user_id)) with check (aula.is_admin(school_id) or aula.is_owner(aula_user_id));
 
 DROP FUNCTION schools(aula.users);

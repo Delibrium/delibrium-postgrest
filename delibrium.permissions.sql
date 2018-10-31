@@ -199,6 +199,7 @@ drop function delibrium.login(text, text);
 create or replace function delibrium.login(username text, password text)
   returns json
   language plpython3u
+  set search_path = public, delibrium
 as $$
   import json
 
@@ -318,7 +319,7 @@ alter table delibrium_secure.user_login enable row level security;
 create role delibrium_authenticator nologin;
 grant delibrium_authenticator to aivuk;
 grant usage on schema delibrium to delibrium_authenticator;
-grant all on all tables in schema delibrium to delibrium_authenticator;
+grant all on all tables in  delibrium to delibrium_authenticator;
 grant usage, select on all sequences in schema delibrium to delibrium_authenticator;
 
 grant usage on schema delibrium_secure to delibrium_authenticator;

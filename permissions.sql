@@ -199,6 +199,7 @@ drop function if exists aula.login(text, text);
 create or replace function aula.login(username text, password text)
   returns json
   language plpython3u
+  set search_path = public, aula
 as $$
   import json
 

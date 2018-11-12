@@ -32,7 +32,7 @@ as $$
             where school_id={};
         """.format(school_id))[0]['count']
         config['totalVoters'] = usercount
-        config['requiredVoteCount'] = usercount * int(config['schoolQuorum'])
+        quorum_threshold = 0.01 * int(config['schoolQuorum'])
     else:
         usercount = plpy.execute("""
             select count(distinct user_id) 
@@ -41,7 +41,10 @@ as $$
             and idea_space={};
         """.format(space_id))[0]['count']
         config['totalVoters'] = usercount
-        config['requiredVoteCount'] = usercount * int(config['classQuorum'])
+        quorum_threshold = 0.01 * int(config['classQuorum'])
+
+    config['totalVoters'] = usercount
+    config['requiredVoteCount'] = usercount * quorum_threshold
 
     return json.dumps(config)
 $$;

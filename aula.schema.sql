@@ -81,7 +81,14 @@ create table if not exists aula.category (
     id          bigserial   primary key,
     school_id   bigint      references aula.school (id),
     name        text        not null,
-    description text
+    description text,
+    icon        bytea
+);
+
+create table if not exists aula.idea_space_category (
+    category_id bigint      not null references aula.category (id) ON DELETE CASCADE,
+    idea_space_id bigint    not null references aula.idea_space (id) ON DELETE CASCADE,
+    primary key (category_id, idea_space_id)
 );
 
 create table if not exists aula.feasible (

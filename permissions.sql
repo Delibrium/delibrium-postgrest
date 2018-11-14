@@ -1,4 +1,8 @@
-drop function  if exists aula_secure.change_password(bigint, text);
+create extension if not exists pgcrypto CASCADE;
+create extension if not exists pgjwt CASCADE;
+create extension if not exists plpython3u CASCADE;
+
+drop function if exists aula_secure.change_password(bigint, text);
 create or replace function aula_secure.change_password(user_id bigint, new_password text)
    returns void
    language plpgsql
@@ -69,7 +73,6 @@ if maybe_user_id:
 
   return json.dumps(usr)
 $$;
-
 
 
 create or replace function aula_secure.check_user()
@@ -236,7 +239,7 @@ as $$
   token = rv[0]['token']
 
   # plpy.execute('set local "response.headers" = \'[{{"Authorization": "Bearer {}"}}, {{"set-cookie": "sessiontoken={};path=/"}}, {{"Path": "/"}}, {{"Domain": "localhost"}}, {{"access-control-allow-origin": "*"}}]\''.format(token, token))
-  plpy.execute('set local "response.headers" = \'[{{"Authorization": "Bearer {}"}}, {{"access-control-allow-origin": "*"}}]\''.format(token, token))
+  plpy.execute('set local "response.headers" = \'[{{"Authorization": "Bearer {}"}}]\''.format(token, token))
 
   user_data = {'role': group_id, 'school_id': school_id, 'user_id': aula_user_id }
   output = {'status': 'success', 'data': user_data}
@@ -385,10 +388,9 @@ grant execute on function aula.logout() to aula_authenticator;
 grant execute on function aula.refresh_token() to aula_authenticator;
 grant execute on function aula.change_password(bigint, text) to aula_authenticator;
 grant execute on function aula.config(bigint, text, text) to aula_authenticator;
+grant execute on function aula.create_school(text, jsonb) to aula_authenticator;
 
 -- You need to put the right user in the line below instead of 'aivuk'
-grant aula_authenticator to aivuk;
+grant aula_authenticator to aula;
 -- Correct the database and set the JWT secret below
-alter database aula2 set "app.jwt_secret" to 'sh3d3SeWWQTn85sDZ8ytKmtS36HJtEhJ';
-
-
+alter database aula set "app.jwt_secret" to 'sh3d3SeWWQTn85sDZ8ytKmtS36HJtEhJ';

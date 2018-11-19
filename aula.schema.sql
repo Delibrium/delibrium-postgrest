@@ -132,6 +132,8 @@ create table if not exists aula.idea_vote (
     val        aula.idea_vote_value not null
 );
 
+alter table aula.idea_vote add unique (idea, created_by);
+
 
 ----------------------------------------------------------------------
 -- comment

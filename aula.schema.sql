@@ -164,6 +164,7 @@ create table if not exists aula.comment_vote (
     val        aula.up_down     not null
 );
 
+alter table aula.comment_vote add unique (comment, created_by);
 
 ----------------------------------------------------------------------
 -- idea space

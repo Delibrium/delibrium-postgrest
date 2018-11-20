@@ -55,6 +55,9 @@ create or replace function aula.school_listing()
 as $$
     import json
     result = plpy.execute("select id, name from aula.school;")
-    plpy.info('schools: {}'.format(result))
-    return json.dumps(list(result))
+    rv = [{
+        "text": elem['name'],
+        "value": elem['id']
+    } for elem in result]
+    return json.dumps(rv)
 $$;

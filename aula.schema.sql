@@ -145,7 +145,8 @@ create table if not exists aula.comment (
     changed_at     timestamptz not null default now(),
     text           text        not null,
     parent_comment bigint      references aula.comment (id),
-    parent_idea    bigint      references aula.idea (id)
+    parent_idea    bigint      references aula.idea (id),
+    is_deleted     boolean
 );
 
 create type aula.up_down as enum

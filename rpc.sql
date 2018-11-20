@@ -48,3 +48,13 @@ as $$
 
     return json.dumps(config)
 $$;
+
+create or replace function aula.school_listing()
+  returns json
+  language plpython3u
+as $$
+    import json
+    result = plpy.execute("select id, name from aula.school;")
+    plpy.info('schools: {}'.format(result))
+    return json.dumps(list(result))
+$$;

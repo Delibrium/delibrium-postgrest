@@ -335,6 +335,11 @@ grant execute on function aula.refresh_token()                      to aula_auth
 grant execute on function aula.change_password(bigint, text)        to aula_authenticator;
 grant execute on function aula.config(bigint, text, text)           to aula_authenticator;
 
+-- Enable public school listing
+create policy public_school_listing on aula.school using (true);
+revoke select on aula.school from public;
+grant select (id, name) on aula.school to public;
+
 
 -- You need to put the right user in the line below instead of 'aivuk'
 grant aula_authenticator to aula;

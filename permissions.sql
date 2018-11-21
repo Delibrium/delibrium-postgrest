@@ -1,4 +1,3 @@
-drop function  if exists aula_secure.change_password(bigint, text);
 create or replace function aula_secure.change_password(user_id bigint, new_password text)
    returns void
    language plpgsql
@@ -8,7 +7,7 @@ declare
  begin
  raise info 'CHANGE PASS: user_group => %, school_id => %', current_setting('request.jwt.claim.user_group', true), current_setting('request.jwt.claim.school_id', true);
   if current_setting('request.jwt.claim.user_group') = 'admin' then
-    select aula.users.school_id into school_id from aula.users where  aula.users.id = user_id;
+    select aula.users.school_id into school_id from aula.users where aula.users.id = user_id;
   else
     school_id := cast(current_setting('request.jwt.claim.school_id') as numeric);
   end if;
@@ -18,7 +17,6 @@ declare
  end
 $$;
 
-drop function if exists aula.change_password(bigint, text);
 create or replace function aula.change_password(user_id bigint, password text)
    returns void
    language plpgsql
@@ -29,7 +27,6 @@ as $$
  end
 $$;
 
-drop function if exists aula.config_update(bigint, text, text);
 create or replace function aula.config_update(space_id bigint, key text, value text)
   returns void
   language plpgsql
@@ -39,7 +36,6 @@ as $$
   end
 $$;
 
-drop function if exists aula.config(bigint);
 create or replace function aula.config(space_id bigint)
   returns json
   language plpgsql
@@ -51,7 +47,6 @@ declare
     return config;
   end
 $$;
-
 
 create or replace function aula.me()
   returns json
@@ -69,8 +64,6 @@ if maybe_user_id:
 
   return json.dumps(usr)
 $$;
-
-
 
 create or replace function aula_secure.check_user()
  returns void
@@ -152,7 +145,6 @@ create trigger encrypt_pass
   for each row
   execute procedure aula_secure.encrypt_pass();
 
-drop function if exists aula_secure.user_id(text, text);
 create or replace function aula_secure.user_id(school_id bigint, username text, password text)
   returns table (uid bigint, sc integer)
   language plpgsql
@@ -184,7 +176,6 @@ CREATE TYPE aula_secure.jwt_token AS (
 
 create language plpython3u;
 
-drop function if exists aula.logout();
 create or replace function aula.logout()
   returns void
   language plpython3u
@@ -199,7 +190,6 @@ as $$
 
 $$;
 
-drop function if exists aula.login(bigint, text, text);
 create or replace function aula.login(school_id bigint, username text, password text)
   returns json
   language plpython3u
@@ -291,15 +281,6 @@ create policy school_admin_user_group on aula.user_group using (aula.is_admin(sc
 create policy school_admin_delegation on aula.delegation using (aula.is_admin(school_id)) with check (aula.is_admin(school_id));
 drop policy if exists user_login on aula_secure.user_login ;
 create policy user_login on aula_secure.user_login using (aula.is_admin(school_id) or aula.is_owner(aula_user_id)) with check (aula.is_admin(school_id) or aula.is_owner(aula_user_id));
-
-DROP FUNCTION schools(aula.users);
-CREATE  or replace FUNCTION schools(aula.users) RETURNS table (id bigint, name text)
-language plpgsql
- AS $$
-  begin
-  return query SELECT aula.school.id, aula.school.name from aula.school where aula.school.id = $1.school_id;
- end;
-$$;
 
 alter table aula.users enable row level security;
 alter table aula.school enable row level security;

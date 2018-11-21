@@ -1,6 +1,65 @@
 create extension if not exists plpython3u CASCADE;
 create or replace language plpython3u;
 
+create or replace function aula.add_user (
+    first_name text, 
+    last_name text, 
+    username text,
+    password text,
+    email text default null, 
+    group_id user_group default 'student',
+    bigint idea_space default null
+  ) returns void language plpgsql
+as $$
+declare
+    school_id bigint;
+    calling_user_id bigint;
+    user_login_id bigint;
+    users_id bigint;
+begin
+    school_id := cast(current_setting('request.jwt.claim.school_id') as numeric);
+    raise info 'school id', school_id;
+
+    calling_user_id = := cast(current_setting('request.jwt.claim.user_id') as numeric);
+    raise info 'calling user id', calling_user_id;
+
+    user_login_id = insert into aula_secure.user_login (
+            school_id, login, password, config
+        ) values (
+            school_id, 
+            add_user.username, 
+            add_user.password, 
+            replace ('{"temp_password": "%"}', '%', add_user.password)
+        ) returning id;
+    raise info 'user_login_id', user_login_id;
+
+    users_id = insert into aula.users (
+            school_id, 
+            created_by, 
+            changed_by, 
+            user_login_id, 
+            first_name, 
+            last_name, 
+            email
+        ) values (
+            school_id, 
+            calling_user_id, 
+            calling_user_id, 
+            user_login_id, 
+            add_user.first_name, 
+            add_user.last_name, 
+            add_user.email
+        ) returning id;
+
+    insert 
+        into aula.user_group (school_id, user_id, group_id, idea_space)
+        values (
+            school_id, users_id, add_user.user_group, add_user.idea_space
+        );
+
+end;
+$$;
+
 create or replace function aula.quorum_info(school_id bigint, space_id bigint default null)
   returns json
   language plpython3u

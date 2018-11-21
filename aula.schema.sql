@@ -19,6 +19,7 @@ create table if not exists aula_secure.user_login (
     password           text          not null
 );
 
+alter table aula_secure.user_login add column config jsonb default '{}';
 ----------
 --  user
 ----------

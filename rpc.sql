@@ -7,8 +7,8 @@ create or replace function aula.add_user (
     username text,
     password text,
     email text default null, 
-    group_id user_group default 'student',
-    bigint idea_space default null
+    user_group aula.group_id default 'student',
+    idea_space bigint default null
   ) returns void language plpgsql
 as $$
 declare
@@ -18,44 +18,46 @@ declare
     users_id bigint;
 begin
     school_id := cast(current_setting('request.jwt.claim.school_id') as numeric);
-    raise info 'school id', school_id;
+    raise info 'school id %', school_id;
 
-    calling_user_id = := cast(current_setting('request.jwt.claim.user_id') as numeric);
-    raise info 'calling user id', calling_user_id;
+    calling_user_id := cast(current_setting('request.jwt.claim.user_id') as numeric);
+    raise info 'calling user id %', calling_user_id;
 
-    user_login_id = insert into aula_secure.user_login (
-            school_id, login, password, config
-        ) values (
-            school_id, 
-            add_user.username, 
-            add_user.password, 
-            replace ('{"temp_password": "%"}', '%', add_user.password)
-        ) returning id;
-    raise info 'user_login_id', user_login_id;
-
-    users_id = insert into aula.users (
-            school_id, 
-            created_by, 
-            changed_by, 
-            user_login_id, 
-            first_name, 
-            last_name, 
-            email
-        ) values (
-            school_id, 
-            calling_user_id, 
-            calling_user_id, 
-            user_login_id, 
-            add_user.first_name, 
-            add_user.last_name, 
-            add_user.email
-        ) returning id;
-
-    insert 
-        into aula.user_group (school_id, user_id, group_id, idea_space)
-        values (
-            school_id, users_id, add_user.user_group, add_user.idea_space
-        );
+    with user_entry as (
+        with user_login_entry as (
+            insert into aula_secure.user_login (
+                school_id, login, password, config
+            ) values (
+                school_id, 
+                add_user.username, 
+                add_user.password, 
+                to_jsonb(replace ('{"temp_password": "%"}', '%', add_user.password))
+            ) returning id
+        ) insert into aula.users (
+                school_id, 
+                created_by, 
+                changed_by, 
+                user_login_id, 
+                first_name, 
+                last_name, 
+                email
+            ) values (
+                school_id, 
+                calling_user_id, 
+                calling_user_id, 
+                (select id from user_login_entry), 
+                add_user.first_name, 
+                add_user.last_name, 
+                add_user.email
+            ) returning id
+        ) insert 
+    into aula.user_group (school_id, user_id, group_id, idea_space)
+    values (
+        school_id, 
+        (select id from user_entry), 
+        add_user.user_group, 
+        add_user.idea_space
+    );
 
 end;
 $$;

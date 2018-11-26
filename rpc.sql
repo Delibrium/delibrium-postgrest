@@ -9,57 +9,56 @@ create or replace function aula.add_user (
     email text default null, 
     user_group aula.group_id default 'student',
     idea_space bigint default null
-  ) returns void language plpgsql
+  ) returns void language plpython3u
 as $$
-declare
-    school_id bigint;
-    calling_user_id bigint;
-    user_login_id bigint;
-    users_id bigint;
-begin
-    school_id := cast(current_setting('request.jwt.claim.school_id') as numeric);
-    raise info 'school id %', school_id;
+import json
 
-    calling_user_id := cast(current_setting('request.jwt.claim.user_id') as numeric);
-    raise info 'calling user id %', calling_user_id;
+res_school_id = plpy.execute("select current_setting('request.jwt.claim.school_id');")
+if len(res_school_id) == 0:
+    plpy.error('Current user is not associated with a school.', sqlstate='PT401')
 
-    with user_entry as (
-        with user_login_entry as (
-            insert into aula_secure.user_login (
-                school_id, login, password, config
-            ) values (
-                school_id, 
-                add_user.username, 
-                add_user.password, 
-                to_jsonb(replace ('{"temp_password": "%"}', '%', add_user.password))
-            ) returning id
-        ) insert into aula.users (
-                school_id, 
-                created_by, 
-                changed_by, 
-                user_login_id, 
-                first_name, 
-                last_name, 
-                email
-            ) values (
-                school_id, 
-                calling_user_id, 
-                calling_user_id, 
-                (select id from user_login_entry), 
-                add_user.first_name, 
-                add_user.last_name, 
-                add_user.email
-            ) returning id
-        ) insert 
+school_id = res_school_id[0]['current_setting']
+
+res_calling_user_id = plpy.execute("""select current_setting('request.jwt.claim.user_id');""")
+if len(res_calling_user_id) == 0:
+    plpy.error('Did not find user associated with this request.', sqlstate='PT401')
+
+calling_user_id = res_calling_user_id[0]['current_setting']
+
+new_config = json.dumps({ "temp_password": password })
+q1 = """insert 
+    into aula_secure.user_login (school_id, login, password, config ) 
+    values ({}, '{}', '{}', '{}') returning id ;""".format(
+        school_id, username, password, new_config
+    )
+res_user_login = plpy.execute(q1)
+user_login = res_user_login[0]
+
+q2 = """insert
+    into aula.users ( 
+        school_id, created_by, changed_by, user_login_id, first_name, last_name, email
+    ) values ( {}, {}, {}, '{}', '{}', '{}', '{}') returning id;
+""".format(
+    school_id,
+    calling_user_id,
+    calling_user_id,
+    user_login['id'],
+    first_name,
+    last_name,
+    email or ''
+)
+res_user = plpy.execute(q2)
+user = res_user[0]
+
+q3 = """insert
     into aula.user_group (school_id, user_id, group_id, idea_space)
-    values (
-        school_id, 
-        (select id from user_entry), 
-        add_user.user_group, 
-        add_user.idea_space
-    );
-
-end;
+    values ( {}, {}, '{}', {});""".format(
+        school_id,
+        user['id'],
+        user_group,
+        idea_space or 'null'
+    )
+plpy.execute(q3)
 $$;
 
 create or replace function aula.quorum_info(school_id bigint, space_id bigint default null)

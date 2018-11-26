@@ -6,6 +6,7 @@ create or replace function aula.create_school(name text, config jsonb default nu
     returns void
     language plpython3u
 as $$
+    import os
     result = plpy.execute("""
         insert into aula.school ( name, config ) values ( '{name}', '{config}' ) returning id;
     """.format(
@@ -13,18 +14,29 @@ as $$
         config=config
     ))
 
-    plpy.info('RESULT', result[0])
+    plpy.info('Created school as', result[0])
 
     school_id = result[0]['id']
 
-    result2 = plpy.execute("""
-        insert into aula.category (school_id, name, description) values ({school_id}, 'Regeln', '');
-        insert into aula.category (school_id, name, description) values ({school_id}, 'Ausstattung', '');
-        insert into aula.category (school_id, name, description) values ({school_id}, 'Aktivitäten', '');
-        insert into aula.category (school_id, name, description) values ({school_id}, 'Unterricht', '');
-        insert into aula.category (school_id, name, description) values ({school_id}, 'Zeit', '');
-        insert into aula.category (school_id, name, description) values ({school_id}, 'Umgebung', '');
-    """.format(school_id=school_id))
+    default_categories = {
+        'Regeln': '',
+        'Ausstattung': '',
+        'Aktivitäten': '',
+        'Unterricht': '',
+        'Zeit': '',
+        'Umgebung': '',
+        'Sonstiges': ''
+    }
+
+    for cat_name, cat_description in default_categories.items():
+        fname = '/Users/pv/projects/aula/delibrium-postgrest/ressources/category_icons/Kategorien_{}-blau.png'.format(cat_name)
+        plpy.info('OPENING ICON', os.path.abspath(fname))
+        with open(fname) as f:
+            cat_icon = f.read()
+            plpy.execute("""insert 
+                into aula.category (school_id, name, description, icon) 
+                values ({}, '{}', '{}', '{}');
+            """.format(school_id, cat_name, cat_description, cat_icon))
 
     return
 $$;

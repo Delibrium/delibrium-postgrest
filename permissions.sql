@@ -280,7 +280,7 @@ create policy school_admin_school_class on aula.school_class using (aula.is_admi
 create policy school_admin_user_group on aula.user_group using (aula.is_admin(school_id)) with check (aula.is_admin(school_id));
 create policy school_admin_delegation on aula.delegation using (aula.is_admin(school_id)) with check (aula.is_admin(school_id));
 drop policy if exists user_login on aula_secure.user_login ;
-create policy user_login on aula_secure.user_login using (aula.is_admin(school_id) or aula.is_owner(aula_user_id)) with check (aula.is_admin(school_id) or aula.is_owner(aula_user_id));
+create policy admin_user_listing on aula.user_listing using (aula.is_admin(school_id)) with check (aula.is_admin(school_id));
 
 alter table aula.users enable row level security;
 alter table aula.school enable row level security;
@@ -315,6 +315,7 @@ grant execute on function aula.logout()                             to aula_auth
 grant execute on function aula.refresh_token()                      to aula_authenticator;
 grant execute on function aula.change_password(bigint, text)        to aula_authenticator;
 grant execute on function aula.config(bigint, text, text)           to aula_authenticator;
+grant execute on function aula.user_listing()                       to aula_authenticator;
 
 -- Enable public school listing
 create policy public_school_listing on aula.school using (true);

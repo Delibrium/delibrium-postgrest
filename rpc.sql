@@ -61,6 +61,47 @@ q3 = """insert
 plpy.execute(q3)
 $$;
 
+create or replace function aula.user_listing()
+    returns json
+    language plpython3u
+as $$
+    import json
+    
+    res_school_id = plpy.execute("select current_setting('request.jwt.claim.school_id');")
+    if len(res_school_id) == 0:
+        plpy.error('Current user is not associated with a school.', sqlstate='PT401')
+
+    school_id = res_school_id[0]['current_setting']
+
+    plpy.info("""
+        select 
+            us.*, 
+            ul.config, 
+            ul.login 
+        from 
+            aula.users as us, 
+            aula_secure.user_login as ul 
+        where 
+            us.user_login_id=ul.id 
+            and us.school_id='{}';
+    """.format(school_id))
+
+    rv = plpy.execute("""
+        select 
+            us.*, 
+            ul.config, 
+            ul.login 
+        from 
+            aula.users as us, 
+            aula_secure.user_login as ul 
+        where 
+            us.user_login_id=ul.id 
+            and us.school_id={};
+    """.format(school_id))
+
+    return json.dumps([user for user in rv])
+$$;
+
 create or replace function aula.quorum_info(school_id bigint, space_id bigint default null)
   returns json
   language plpython3u

@@ -387,8 +387,8 @@ grant execute on function aula.change_password(bigint, text) to aula_authenticat
 grant execute on function aula.config(bigint, text, text) to aula_authenticator;
 
 -- You need to put the right user in the line below instead of 'aivuk'
-grant aula_authenticator to aivuk;
+grant aula_authenticator to aula;
 -- Correct the database and set the JWT secret below
-alter database aula2 set "app.jwt_secret" to 'sh3d3SeWWQTn85sDZ8ytKmtS36HJtEhJ';
+alter database aula set "app.jwt_secret" to 'sh3d3SeWWQTn85sDZ8ytKmtS36HJtEhJ';
 
 

@@ -7,6 +7,8 @@ create or replace function aula.create_school(name text, config jsonb default nu
     language plpython3u
 as $$
     import os
+    import base64
+
     result = plpy.execute("""
         insert into aula.school ( name, config ) values ( '{name}', '{config}' ) returning id;
     """.format(
@@ -18,26 +20,28 @@ as $$
 
     school_id = result[0]['id']
 
+    default_description = "Beschreibung der Kategorie"
     default_categories = {
-        'Regeln': '',
-        'Ausstattung': '',
-        'Aktivitäten': '',
-        'Unterricht': '',
-        'Zeit': '',
-        'Umgebung': '',
-        'Sonstiges': ''
+        'Regeln': default_description,
+        'Ausstattung': default_description,
+        'Aktivitäten': default_description,
+        'Unterricht': default_description,
+        'Zeit': default_description,
+        'Umgebung': default_description,
+        'Sonstiges': default_description
     }
 
     for cat_name, cat_description in default_categories.items():
-        fname = '/Users/pv/projects/aula/delibrium-postgrest/ressources/category_icons/Kategorien_{}-blau.png'.format(cat_name)
-        plpy.info('OPENING ICON', os.path.abspath(fname))
-        with open(fname) as f:
-            cat_icon = f.read()
-            plpy.execute("""insert 
+        fname = '/ressources/category_icons/Kategorien_{}-blau.png'.format(cat_name)
+        plpy.info('Opening icon file from', os.path.abspath(fname))
+        with open(fname, 'rb') as f:
+            cat_icon = base64.b64encode(f.read())
+            plpy.info("File contents:", cat_icon)
+            q = plpy.prepare("""insert 
                 into aula.category (school_id, name, description, icon) 
-                values ({}, '{}', '{}', '{}');
-            """.format(school_id, cat_name, cat_description, cat_icon))
-
+                values ($1, $2, $3, $4);
+            """, ["bigint", "text", "text", "bytea"])
+            plpy.execute(q, [school_id, cat_name, cat_description, cat_icon])
     return
 $$;
 

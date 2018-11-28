@@ -161,20 +161,22 @@ as $$
             ul.config,
             ul.login,
             array_agg(row(
-                ug.group_id, 
+                ug.group_id,
                 ug.idea_space,
-                (select sp.title 
-                    from aula.idea_space as sp 
-                    where sp.id=ug.idea_space)
+                sp.title
             )) as groups
         from
-            aula.users as us,
-            aula.user_group as ug,
-            aula_secure.user_login as ul
-        where
-            us.user_login_id=ul.id
-            and us.school_id=1
-            and ug.user_id=us.id
+            aula.users as us
+            join
+                aula_secure.user_login as ul
+                on ul.id=us.user_login_id
+            left join 
+                aula.user_group as ug 
+                on ug.user_id=us.id
+            left join 
+                aula.idea_space as sp 
+                on sp.id=ug.idea_space
+        where us.school_id={}
         group by (us.id, ul.login, ul.config);
     """.format(school_id))
 

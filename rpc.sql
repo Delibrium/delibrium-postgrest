@@ -160,11 +160,13 @@ as $$
             us.*,
             ul.config,
             ul.login,
+            array_agg(row(
                 ug.group_id, 
                 ug.idea_space,
-            (select sp.title as idea_space_title 
+                (select sp.title 
                     from aula.idea_space as sp 
                     where sp.id=ug.idea_space)
+            )) as groups
         from
             aula.users as us,
             aula.user_group as ug,
@@ -172,7 +174,8 @@ as $$
         where
             us.user_login_id=ul.id
             and us.school_id=1
-            and ug.user_id=us.id;
+            and ug.user_id=us.id
+        group by (us.id, ul.login, ul.config);
     """.format(school_id))
 
     return json.dumps([user for user in rv])

@@ -20,6 +20,8 @@ create table if not exists aula_secure.user_login (
 );
 
 alter table aula_secure.user_login add column config jsonb default '{}';
+alter table aula_secure.user_login 
+    add constraint unique_login unique (school_id, login);
 ----------
 --  user
 ----------

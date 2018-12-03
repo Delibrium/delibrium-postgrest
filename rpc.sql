@@ -6,6 +6,7 @@ create or replace function aula.quorum_info(school_id bigint, space_id bigint de
   language plpython3u
 as $$
     import json
+    import math
 
     result = plpy.execute("""
         select config 
@@ -44,7 +45,7 @@ as $$
         quorum_threshold = 0.01 * int(config['classQuorum'])
 
     config['totalVoters'] = usercount
-    config['requiredVoteCount'] = usercount * quorum_threshold
+    config['requiredVoteCount'] = max(1, math.ceil(usercount * quorum_threshold))
 
     return json.dumps(config)
 $$;

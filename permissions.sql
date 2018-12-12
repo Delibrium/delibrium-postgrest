@@ -1,4 +1,3 @@
-drop function  if exists aula_secure.change_password(bigint, text);
 create or replace function aula_secure.change_password(user_id bigint, new_password text)
    returns void
    language plpgsql
@@ -8,7 +7,7 @@ declare
  begin
  raise info 'CHANGE PASS: user_group => %, school_id => %', current_setting('request.jwt.claim.user_group', true), current_setting('request.jwt.claim.school_id', true);
   if current_setting('request.jwt.claim.user_group') = 'admin' then
-    select aula.users.school_id into school_id from aula.users where  aula.users.id = user_id;
+    select aula.users.school_id into school_id from aula.users where aula.users.id = user_id;
   else
     school_id := cast(current_setting('request.jwt.claim.school_id') as numeric);
   end if;
@@ -18,7 +17,6 @@ declare
  end
 $$;
 
-drop function if exists aula.change_password(bigint, text);
 create or replace function aula.change_password(user_id bigint, password text)
    returns void
    language plpgsql
@@ -29,7 +27,6 @@ as $$
  end
 $$;
 
-drop function if exists aula.config_update(bigint, text, text);
 create or replace function aula.config_update(space_id bigint, key text, value text)
   returns void
   language plpgsql
@@ -39,7 +36,6 @@ as $$
   end
 $$;
 
-drop function if exists aula.config(bigint);
 create or replace function aula.config(space_id bigint)
   returns json
   language plpgsql
@@ -51,7 +47,6 @@ declare
     return config;
   end
 $$;
-
 
 create or replace function aula.me()
   returns json
@@ -70,8 +65,6 @@ if maybe_user_id:
   return json.dumps(usr)
 $$;
 
-
-
 create or replace function aula_secure.check_user()
  returns void
  language plpgsql
@@ -82,12 +75,6 @@ declare
   session_count_claim integer;
   session_count integer;
 begin
---  user_role := current_setting(request.jwt.claim.user_group);
---  if user_role = '' then
---    raise exception 'session not valid';
---  end if;
-  raise info 'HEADER %', current_setting('request.header.x-uri', true);
-
   if current_setting('request.jwt.claim.user_id', true) != '' then
     raise info 'user_id %', current_setting('request.jwt.claim.user_id', true) = '';
     user_id := current_setting('request.jwt.claim.user_id', true);
@@ -158,20 +145,29 @@ create trigger encrypt_pass
   for each row
   execute procedure aula_secure.encrypt_pass();
 
-drop function if exists aula_secure.user_id(text,text);
-create or replace function
-aula_secure.user_id(in username text, in password text)
+create or replace function aula_secure.user_id(school_id bigint, username text, password text)
   returns table (uid bigint, sc integer)
   language plpgsql
-  as $$
-begin
-  set "request.jwt.claim.user_group" TO 'admin';
+as $$
+  begin
+    set "request.jwt.claim.user_group" TO 'admin';
 
-  return query select aula.users.id, aula_secure.user_login.session_count
-              from aula.users, aula_secure.user_login where aula.users.id = aula_secure.user_login.aula_user_id and
-                   aula.users.email = user_id.username  and
-                   aula_secure.user_login.password = crypt(user_id.password, aula_secure.user_login.password);
-end;
+    return query 
+      select 
+        aula.users.id, 
+        aula_secure.user_login.session_count
+      from 
+        aula.users, 
+        aula_secure.user_login 
+      where 
+        aula.users.user_login_id = aula_secure.user_login.id 
+        and aula.users.school_id = user_id.school_id
+        and aula_secure.user_login.login = user_id.username  
+        and aula_secure.user_login.password = crypt(
+          user_id.password, 
+          aula_secure.user_login.password
+        );
+  end;
 $$;
 
 CREATE TYPE aula_secure.jwt_token AS (
@@ -180,7 +176,6 @@ CREATE TYPE aula_secure.jwt_token AS (
 
 create language plpython3u;
 
-drop function if exists aula.logout();
 create or replace function aula.logout()
   returns void
   language plpython3u
@@ -195,15 +190,14 @@ as $$
 
 $$;
 
-drop function if exists aula.login(text, text);
-create or replace function aula.login(username text, password text)
+create or replace function aula.login(school_id bigint, username text, password text)
   returns json
   language plpython3u
   set search_path = public, aula
 as $$
   import json
 
-  rv = plpy.execute('select * from aula_secure.user_id(\'{}\', \'{}\')'.format(username, password))
+  rv = plpy.execute('select * from aula_secure.user_id(\'{}\', \'{}\', \'{}\')'.format(school_id, username, password))
   plpy.execute('set "request.jwt.claim.user_group" TO \'\'')
   plpy.info(rv)
 
@@ -218,9 +212,8 @@ as $$
 
 
   plpy.execute('set "request.jwt.claim.user_group" TO \'admin\'')
-  rv = plpy.execute('select group_id, school_id from aula.user_group where user_id = {}'.format(aula_user_id))
+  rv = plpy.execute('select group_id from aula.user_group where user_id = {}'.format(aula_user_id))
 
-  school_id = rv[0]['school_id']
   group_id = rv[0]['group_id']
   plpy.execute('set "request.jwt.claim.user_group" TO \'{}\''.format(group_id))
   plpy.info(school_id)
@@ -235,7 +228,6 @@ as $$
 
   token = rv[0]['token']
 
-  # plpy.execute('set local "response.headers" = \'[{{"Authorization": "Bearer {}"}}, {{"set-cookie": "sessiontoken={};path=/"}}, {{"Path": "/"}}, {{"Domain": "localhost"}}, {{"access-control-allow-origin": "*"}}]\''.format(token, token))
   plpy.execute('set local "response.headers" = \'[{{"Authorization": "Bearer {}"}}, {{"access-control-allow-origin": "*"}}]\''.format(token, token))
 
   user_data = {'role': group_id, 'school_id': school_id, 'user_id': aula_user_id }
@@ -273,61 +265,6 @@ $$ stable security definer language plpgsql;
 -- by default all functions are accessible to the public, we need to remove that and define our specific access rules
 revoke all privileges on function aula.refresh_token() from public;
 
--- drop function aula.login(text,text);
--- create or replace function
--- aula.login(username text, password text) returns json
---   language plpgsql
---   as $$
--- declare
---   _role aula.group_id;
---   aula_user_id bigint;
---   _school_id bigint;
---   result aula_secure.jwt_token;
---   token_text text;
---   role text;
---   t Json[];
--- begin
---
---   -- check email and password
---   select aula_secure.user_id(username, password) into aula_user_id;
---   role := 'aula_authenticator';
---
---   if aula_user_id is null then
---     raise invalid_password using message = 'invalid user or password';
---   end if;
---
---   -- Just to be able to query the user role, otherwise because of the check constraint
---   -- the result would be empty
---   set "request.jwt.claim.user_group" TO 'admin';
---   select group_id, school_id into _role, _school_id from aula.user_group where user_id = aula_user_id;
---   set "request.jwt.claim.user_group" TO _role;
---
---   select sign(
---       row_to_json(r), current_setting('app.jwt_secret')
---     ) as token
---     from (
---       select _role as user_group, _school_id as school_id, role as role, aula_user_id as user_id,
---          extract(epoch from now())::integer + 60*60 as exp
---     ) r
---     into result;
---
---   select sign(
---       row_to_json(r), current_setting('app.jwt_secret')
---     )
---     from (
---       select _role as user_group, _school_id as school_id, role as role, aula_user_id as user_id,
---          extract(epoch from now())::integer + 60*60 as exp
---     ) r
---     into token_text;
---
---   t := array[row_to_json(result)];
---   token_text := '[{"set-cookie": "e=2"}]';
---
---   set local "response.headers" = t;
---
---   return t;
--- end;
--- $$;
 
 create policy school_admin_users on aula.users using (aula.is_admin(school_id)) with check (aula.is_admin(school_id));
 create policy school_admin_school on aula.school using (aula.is_admin(id)) with check (aula.is_admin(id));
@@ -343,16 +280,8 @@ create policy school_admin_school_class on aula.school_class using (aula.is_admi
 create policy school_admin_user_group on aula.user_group using (aula.is_admin(school_id)) with check (aula.is_admin(school_id));
 create policy school_admin_delegation on aula.delegation using (aula.is_admin(school_id)) with check (aula.is_admin(school_id));
 drop policy if exists user_login on aula_secure.user_login ;
-create policy user_login on aula_secure.user_login using (aula.is_admin(school_id) or aula.is_owner(aula_user_id)) with check (aula.is_admin(school_id) or aula.is_owner(aula_user_id));
-
-DROP FUNCTION schools(aula.users);
-CREATE  or replace FUNCTION schools(aula.users) RETURNS table (id bigint, name text)
-language plpgsql
- AS $$
-  begin
-  return query SELECT aula.school.id, aula.school.name from aula.school where aula.school.id = $1.school_id;
- end;
-$$;
+create policy user_login on aula_secure.user_login using (aula.is_admin(school_id)) with check (aula.is_admin(school_id));
+create policy admin_user_listing on aula.user_listing using (aula.is_admin(school_id)) with check (aula.is_admin(school_id));
 
 alter table aula.users enable row level security;
 alter table aula.school enable row level security;
@@ -374,21 +303,32 @@ grant usage on schema aula to aula_authenticator;
 grant all on all tables in schema aula to aula_authenticator;
 grant usage, select on all sequences in schema aula to aula_authenticator;
 
-grant usage on schema aula_secure to aula_authenticator;
-grant all on all tables in schema aula_secure to aula_authenticator;
-grant usage, select on all sequences in schema aula_secure to aula_authenticator;
-grant execute on function aula_secure.check_user() to aula_authenticator;
-grant execute on function aula_secure.encrypt_pass() to aula_authenticator;
-grant execute on function aula_secure.user_id(text,text) to aula_authenticator;
-grant execute on function aula.login(text,text) to aula_authenticator;
-grant execute on function aula.logout() to aula_authenticator;
-grant execute on function aula.refresh_token() to aula_authenticator;
-grant execute on function aula.change_password(bigint, text) to aula_authenticator;
-grant execute on function aula.config(bigint, text, text) to aula_authenticator;
+
+grant usage on schema aula_secure                                   to aula_authenticator;
+grant all on all tables in schema aula_secure                       to aula_authenticator;
+grant usage, select on all sequences in schema aula_secure          to aula_authenticator;
+
+grant execute on function aula_secure.check_user()                  to aula_authenticator;
+grant execute on function aula_secure.encrypt_pass()                to aula_authenticator;
+grant execute on function aula_secure.user_id(bigint, text, text)   to aula_authenticator;
+grant execute on function aula.login(bigint, text, text)            to aula_authenticator;
+grant execute on function aula.logout()                             to aula_authenticator;
+grant execute on function aula.refresh_token()                      to aula_authenticator;
+grant execute on function aula.change_password(bigint, text)        to aula_authenticator;
+grant execute on function aula.config(bigint, text, text)           to aula_authenticator;
+grant execute on function aula.user_listing()                       to aula_authenticator;
+
+
+
+-- Enable public school listing
+create policy public_school_listing on aula.school using (true);
+revoke select on aula.school from public;
+grant select (id, name) on aula.school to public;
+
 
 -- You need to put the right user in the line below instead of 'aivuk'
-grant aula_authenticator to aivuk;
+grant aula_authenticator to aula;
 -- Correct the database and set the JWT secret below
-alter database aula2 set "app.jwt_secret" to 'sh3d3SeWWQTn85sDZ8ytKmtS36HJtEhJ';
+alter database aula set "app.jwt_secret" to 'sh3d3SeWWQTn85sDZ8ytKmtS36HJtEhJ';
 
 

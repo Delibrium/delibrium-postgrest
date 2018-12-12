@@ -19,6 +19,9 @@ create table if not exists aula_secure.user_login (
     password           text          not null
 );
 
+alter table aula_secure.user_login add column config jsonb default '{}';
+alter table aula_secure.user_login 
+    add constraint unique_login unique (school_id, login);
 ----------
 --  user
 ----------
@@ -37,7 +40,7 @@ create table if not exists aula.users (
 );
 
 alter table aula.school add column created_by bigint references aula.users (id);
-alter table aula_secure.user_login add column aula_user_id bigint references aula.users (id);
+alter table aula_secure.user_login add column aula_user_id bigint references aula.users (id) on delete cascade;
 alter table aula_secure.user_login add column created_by bigint references aula.users (id);
 alter table aula_secure.user_login add column changed_by bigint references aula.users (id);
 

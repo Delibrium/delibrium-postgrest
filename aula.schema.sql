@@ -77,6 +77,8 @@ create table if not exists aula.topic (
     phase       aula.phase  not null
 );
 
+alter table aula.topic add column config jsonb default '{}';
+
 -- create type aula.category as enum
 --     ('rule', 'equipment', 'class', 'time', 'environment');
 

@@ -155,11 +155,12 @@ create table if not exists aula.comment (
     id             bigserial   primary key,
     created_by     bigint      not null references aula.users (id),
     created_at     timestamptz not null default now(),
-    changed_by     bigint      not null references aula.users (id),
-    changed_at     timestamptz not null default now(),
+    changed_by     bigint      references aula.users (id),
+    changed_at     timestamptz default now(),
     text           text        not null,
     parent_comment bigint      references aula.comment (id),
-    parent_idea    bigint      references aula.idea (id)
+    parent_idea    bigint      references aula.idea (id),
+    is_deleted     boolean
 );
 
 create type aula.up_down as enum
@@ -175,6 +176,7 @@ create table if not exists aula.comment_vote (
     val        aula.up_down     not null
 );
 
+alter table aula.comment_vote add unique (comment, created_by);
 
 ----------------------------------------------------------------------
 -- idea space

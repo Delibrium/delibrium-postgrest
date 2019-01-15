@@ -2,10 +2,10 @@ create extension if not exists plpython3u CASCADE;
 create or replace language plpython3u;
 
 create or replace function aula.add_user (
-    first_name text, 
-    last_name text, 
+    first_name text,
+    last_name text,
     username text,
-    email text default null, 
+    email text default null,
     user_group aula.group_id default 'student',
     idea_space bigint default null
   ) returns void language plpython3u
@@ -35,7 +35,7 @@ def create_random_password():
             words = f.readlines()
         return ".".join([random.choice(words).strip() for _ in range(2)])
     except FileNotFoundError:
-        plpy.warning("""Place a dictionary file in {} to enable 
+        plpy.warning("""Place a dictionary file in {} to enable
             word-based temp passwords""".format(dict_location))
         return  ''.join(random.choice(
             string.ascii_uppercase + string.ascii_lowercase + string.digits
@@ -45,8 +45,8 @@ def create_random_password():
 password = create_random_password()
 new_config = json.dumps({ "temp_password": password })
 
-q1 = """insert 
-    into aula_secure.user_login (school_id, login, password, config ) 
+q1 = """insert
+    into aula_secure.user_login (school_id, login, password, config )
     values ({}, '{}', '{}', '{}') returning id ;""".format(
         school_id, username, password, new_config
     )
@@ -55,13 +55,13 @@ res_user_login = plpy.execute(q1)
 user_login = res_user_login[0]
 
 q2 = """insert
-    into aula.users ( 
-        school_id, 
-        created_by, 
-        changed_by, 
-        user_login_id, 
-        first_name, 
-        last_name, 
+    into aula.users (
+        school_id,
+        created_by,
+        changed_by,
+        user_login_id,
+        first_name,
+        last_name,
         email
     ) values ( {}, {}, {}, '{}', '{}', '{}', '{}') returning id;
 """.format(
@@ -98,8 +98,8 @@ $$;
 
 create or replace function aula.update_user(
     id bigint,
-    first_name text, 
-    last_name text, 
+    first_name text,
+    last_name text,
     username text,
     email text default null
 ) returns void language plpython3u
@@ -118,15 +118,15 @@ as $$
         plpy.error('Did not find user associated with this request.', sqlstate='PT401')
     calling_user_id = res_calling_user_id[0]['current_setting']
 
-    q = """update 
-    aula.users set 
+    q = """update
+    aula.users set
         first_name='{}',
         last_name='{}',
         email='{}',
         changed_by='{}',
-        changed_at=now() 
+        changed_at=now()
     where
-        id='{}' 
+        id='{}'
     returning user_login_id;""".format(
         first_name,
         last_name,
@@ -148,7 +148,7 @@ create or replace function aula.user_listing()
     language plpython3u
 as $$
     import json
-    
+
     res_school_id = plpy.execute("select current_setting('request.jwt.claim.school_id');")
     if len(res_school_id) == 0:
         plpy.error('Current user is not associated with a school.', sqlstate='PT401')
@@ -170,17 +170,60 @@ as $$
             join
                 aula_secure.user_login as ul
                 on ul.id=us.user_login_id
-            left join 
-                aula.user_group as ug 
+            left join
+                aula.user_group as ug
                 on ug.user_id=us.id
-            left join 
-                aula.idea_space as sp 
+            left join
+                aula.idea_space as sp
                 on sp.id=ug.idea_space
         where us.school_id={}
         group by (us.id, ul.login, ul.config);
     """.format(school_id))
 
     return json.dumps([user for user in rv])
+$$;
+
+create or replace function aula.create_school(name text, config jsonb default null)
+    returns void
+    language plpython3u
+as $$
+    import os
+    import base64
+
+    result = plpy.execute("""
+        insert into aula.school ( name, config ) values ( '{name}', '{config}' ) returning id;
+    """.format(
+        name=name,
+        config=config
+    ))
+
+    plpy.info('Created school as', result[0])
+
+    school_id = result[0]['id']
+
+    default_description = "Beschreibung der Kategorie"
+    default_categories = {
+        'Regeln': default_description,
+        'Ausstattung': default_description,
+        'Aktivitäten': default_description,
+        'Unterricht': default_description,
+        'Zeit': default_description,
+        'Umgebung': default_description,
+        'Sonstiges': default_description
+    }
+
+    for cat_name, cat_description in default_categories.items():
+        fname = '/ressources/category_icons/Kategorien_{}-blau.png'.format(cat_name)
+        plpy.info('Opening icon file from', os.path.abspath(fname))
+        with open(fname, 'rb') as f:
+            cat_icon = base64.b64encode(f.read())
+            plpy.info("File contents:", cat_icon)
+            q = plpy.prepare("""insert
+                into aula.category (school_id, name, description, icon)
+                values ($1, $2, $3, $4);
+            """, ["bigint", "text", "text", "bytea"])
+            plpy.execute(q, [school_id, cat_name, cat_description, cat_icon])
+    return
 $$;
 
 create or replace function aula.quorum_info(school_id bigint, space_id bigint default null)
@@ -191,8 +234,8 @@ as $$
     import math
 
     result = plpy.execute("""
-        select config 
-        from aula.school 
+        select config
+        from aula.school
         where id = {};
     """.format(school_id))
 
@@ -201,7 +244,7 @@ as $$
         return
 
     config = json.loads(result[0]['config'])
-    
+
     if 'classQuorum' not in config:
         config = {
             'schoolQuorum': 30,
@@ -210,16 +253,16 @@ as $$
 
     if space_id is None:
         usercount = plpy.execute("""
-            select count(distinct user_id) 
-            from aula.user_group 
+            select count(distinct user_id)
+            from aula.user_group
             where school_id={};
         """.format(school_id))[0]['count']
         config['totalVoters'] = usercount
         quorum_threshold = 0.01 * int(config['schoolQuorum'])
     else:
         usercount = plpy.execute("""
-            select count(distinct user_id) 
-            from aula.user_group 
+            select count(distinct user_id)
+            from aula.user_group
             where group_id='student'
             and idea_space={};
         """.format(space_id))[0]['count']
@@ -252,7 +295,7 @@ as $$
     import json
     rv = plpy.execute("""
         update aula.topic
-        set 
+        set
             phase='{phase}',
             config=jsonb_set(config, '{{{phase}_started}}', to_json(now())::jsonb, true)
         where id={topic_id}

@@ -1,0 +1,9 @@
+\ir ./add_user.sql
+\ir ./update_user.sql
+\ir ./user_listing.sql
+\ir ./school_listing.sql
+\ir ./change_phase.sql
+\ir ./quorum_info.sql
+\ir ./change_password.sql
+\ir ./config.sql
+\ir ./config_update.sql

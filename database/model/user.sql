@@ -12,6 +12,7 @@ create table if not exists aula.users (
     user_login_id bigint references aula_secure.user_login (id),
     first_name    text              not null,
     last_name     text              not null,
+    picture       text,
     email         text
 );
 

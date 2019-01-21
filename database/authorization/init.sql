@@ -2,6 +2,7 @@
 \ir encrypt_pass.sql
 \ir is_admin.sql
 \ir is_owner.sql
+\ir from_school.sql
 \ir jwt_token.sql
 \ir login.sql
 \ir logout.sql

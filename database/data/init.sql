@@ -3,12 +3,12 @@ insert into aula.school(id, name) values (1, 'aula');
 
 -- Insert admin user
 insert into aula_secure.user_login (school_id, login, password) values ( 1, 'admin', 'password');
-insert into aula.users (school_id, user_login_id, first_name, last_name) values (1, 1, 'Admin', 'aula');
+insert into aula.users (school_id, user_login_id, first_name, last_name, changed_by) values (1, 1, 'Admin', 'aula', 1);
 insert into aula.user_group (school_id, user_id, group_id) values(1, 1, 'admin');
 
 -- Insert student
 insert into aula_secure.user_login (school_id, login, password) values ( 1, 'student', 'password');
-insert into aula.users (school_id, user_login_id, first_name, last_name) values (1, 2, 'Student', 'Example');
+insert into aula.users (school_id, user_login_id, first_name, last_name, changed_by) values (1, 2, 'Student', 'Example', 1);
 insert into aula.user_group (school_id, user_id, group_id) values(1, 2, 'student');
 
 -- Insert Class

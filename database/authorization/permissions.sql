@@ -120,7 +120,7 @@ grant execute on function aula_secure.user_id(bigint, text, text)   to aula_auth
 grant execute on function aula.login(bigint, text, text)            to aula_authenticator;
 grant execute on function aula.logout()                             to aula_authenticator;
 grant execute on function aula.refresh_token()                      to aula_authenticator;
-grant execute on function aula.change_password(bigint, text)        to aula_authenticator;
+grant execute on function aula.change_password(bigint, text, text)        to aula_authenticator;
 grant execute on function aula.user_listing()                       to aula_authenticator;
 
 -- Enable public school listing

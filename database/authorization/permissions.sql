@@ -23,9 +23,9 @@ create policy school_admin_feasible on aula.feasible using (aula.is_admin(school
 drop policy if exists school_select_idea on aula.idea;
 create policy school_select_idea on aula.idea for select using (aula.is_admin(school_id) or (aula.from_school(school_id)));
 drop policy if exists school_create_idea on aula.idea;
-create policy school_create_idea on aula.idea for insert with check (aula.is_admin(school_id) or (aula.from_school(school_id)));
+create policy school_create_idea on aula.idea for insert using (aula.is_admin(school_id) or (aula.is_owner(created_by))) with check (aula.is_admin(school_id) or (aula.from_school(school_id)));
 drop policy if exists school_update_idea on aula.idea;
-create policy school_update_idea on aula.idea for update with check (aula.is_admin(school_id) or (aula.is_owner(created_by)));
+create policy school_update_idea on aula.idea for update using (aula.is_admin(school_id) or (aula.is_owner(created_by))) with check (aula.is_admin(school_id) or (aula.is_owner(created_by)));
 drop policy if exists school_delete_idea on aula.idea;
 create policy school_delete_idea on aula.idea for delete using (aula.is_admin(school_id));
 
@@ -39,19 +39,19 @@ drop policy if exists school_select_idea_like on aula.idea_like;
 create policy school_select_idea_like on aula.idea_like for select using (aula.is_admin(school_id) or (aula.from_school(school_id)));
 drop policy if exists school_create_idea_like on aula.idea_like;
 drop policy if exists school_create_idea_like on aula.idea_like;
-create policy school_create_idea_like on aula.idea_like for insert with check (aula.is_admin(school_id) or (aula.from_school(school_id)));
+create policy school_create_idea_like on aula.idea_like for insert using (aula.is_admin(school_id) or (aula.is_owner(created_by))) with check (aula.is_admin(school_id) or (aula.from_school(school_id)));
 drop policy if exists school_update_idea_like on aula.idea_like;
-create policy school_update_idea_like on aula.idea_like for update with check (aula.is_admin(school_id) or (aula.is_owner(created_by)));
+create policy school_update_idea_like on aula.idea_like for update using (aula.is_admin(school_id) or (aula.is_owner(created_by))) with check (aula.is_admin(school_id) or (aula.is_owner(created_by)));
 drop policy if exists school_delete_idea_like on aula.idea_like;
-create policy school_delete_idea_like on aula.idea_like for delete using (aula.is_admin(school_id));
+create policy school_delete_idea_like on aula.idea_like for delete using (aula.is_admin(school_id) or (aula.is_owner(created_by)));
 
 -- Idea Vote
 drop policy if exists school_select_idea_vote on aula.idea_vote;
 create policy school_select_idea_vote on aula.idea_vote for select using (aula.is_admin(school_id) or (aula.from_school(school_id)));
 drop policy if exists school_create_idea_vote on aula.idea_vote;
-create policy school_create_idea_vote on aula.idea_vote for insert with check (aula.is_admin(school_id) or (aula.from_school(school_id)));
+create policy school_create_idea_vote on aula.idea_vote for insert using (aula.is_admin(school_id) or (aula.is_owner(created_by))) with check (aula.is_admin(school_id) or (aula.from_school(school_id)));
 drop policy if exists school_update_idea_vote on aula.idea_vote;
-create policy school_update_idea_vote on aula.idea_vote for update with check (aula.is_admin(school_id) or (aula.is_owner(created_by)));
+create policy school_update_idea_vote on aula.idea_vote for update using (aula.is_admin(school_id) or (aula.is_owner(created_by))) with check (aula.is_admin(school_id) or (aula.is_owner(created_by)));
 drop policy if exists school_delete_idea_vote on aula.idea_vote;
 create policy school_delete_idea_vote on aula.idea_vote for delete using (aula.is_admin(school_id) or (aula.is_owner(created_by)));
 
@@ -60,9 +60,9 @@ create policy school_delete_idea_vote on aula.idea_vote for delete using (aula.i
 drop policy if exists school_select_comment on aula.comment;
 create policy school_select_comment on aula.comment for select using (aula.is_admin(school_id) or (aula.from_school(school_id)));
 drop policy if exists school_create_comment on aula.comment;
-create policy school_create_comment on aula.comment for insert with check (aula.is_admin(school_id) or (aula.from_school(school_id)));
+create policy school_create_comment on aula.comment for insert using (aula.is_admin(school_id) or (aula.from_school(school_id))) with check (aula.is_admin(school_id) or (aula.from_school(school_id)));
 drop policy if exists school_update_comment on aula.comment;
-create policy school_update_comment on aula.comment for update with check (aula.is_admin(school_id) or (aula.is_owner(created_by)));
+create policy school_update_comment on aula.comment for update using (aula.is_admin(school_id) or (aula.from_school(school_id))) with check (aula.is_admin(school_id) or (aula.is_owner(created_by)));
 drop policy if exists school_delete_comment on aula.comment;
 create policy school_delete_comment on aula.comment for delete using (aula.is_admin(school_id));
 
@@ -70,11 +70,11 @@ create policy school_delete_comment on aula.comment for delete using (aula.is_ad
 drop policy if exists school_select_comment_vote on aula.comment_vote;
 create policy school_select_comment_vote on aula.comment_vote for select using (aula.is_admin(school_id) or (aula.from_school(school_id)));
 drop policy if exists school_create_comment_vote on aula.comment_vote;
-create policy school_create_comment_vote on aula.comment_vote for insert with check (aula.is_admin(school_id) or (aula.from_school(school_id)));
+create policy school_create_comment_vote on aula.comment_vote for insert using (aula.is_admin(school_id) or (aula.from_school(school_id))) with check (aula.is_admin(school_id) or (aula.from_school(school_id)));
 drop policy if exists school_update_comment_vote on aula.comment_vote;
-create policy school_update_comment_vote on aula.comment_vote for update with check (aula.is_admin(school_id) or (aula.is_owner(created_by)));
+create policy school_update_comment_vote on aula.comment_vote for update using (aula.is_admin(school_id) or (aula.from_school(school_id))) with check (aula.is_admin(school_id) or (aula.is_owner(created_by)));
 drop policy if exists school_delete_comment_vote on aula.comment_vote;
-create policy school_delete_comment_vote on aula.comment_vote for delete using (aula.is_admin(school_id));
+create policy school_delete_comment_vote on aula.comment_vote for delete using (aula.is_admin(school_id) or (aula.from_school(school_id))) using (aula.is_admin(school_id));
 
 
 -- Delegation

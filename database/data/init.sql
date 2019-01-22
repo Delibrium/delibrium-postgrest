@@ -1,5 +1,5 @@
 -- Insert special school
-insert into aula.school(id, name) values (1, 'Aula');
+insert into aula.school(id, name) values (1, 'aula');
 
 -- Insert admin user
 insert into aula_secure.user_login (school_id, login, password) values ( 1, 'admin', 'password');

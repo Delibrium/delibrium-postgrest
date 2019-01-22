@@ -88,7 +88,7 @@ drop policy if exists school_delete_delegation on aula.delegation;
 create policy school_delete_delegation on aula.delegation for delete using (aula.is_admin(school_id));
 
 drop policy if exists user_login on aula_secure.user_login ;
-create policy user_login on aula_secure.user_login using (aula.is_admin(school_id)) with check (aula.is_admin(school_id));
+create policy user_login on aula_secure.user_login using (aula.is_admin(school_id) or aula.is_owner(aula_user_id)) with check (aula.is_admin(school_id) or aula.is_owner(aula_user_id));
 -- create policy admin_user_listing on aula.user_listing using (aula.is_admin(school_id)) with check (aula.is_admin(school_id));
 
 alter table aula.users enable row level security;

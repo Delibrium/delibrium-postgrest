@@ -8,7 +8,7 @@ drop policy if exists school_admin_user_group on aula.user_group;
 create policy school_admin_user_group on aula.user_group using (aula.is_admin(school_id) or aula.is_owner(user_id)) with check (aula.is_admin(school_id) or aula.is_owner(user_id));
 
 drop policy if exists school_admin_school on aula.school;
-create policy school_admin_school on aula.school using (aula.is_admin(id)) with check (aula.is_admin(id));
+create policy school_admin_school on aula.school using (aula.is_admin(id) or aula.from_school(school_id)) with check (aula.is_admin(id));
 
 drop policy if exists school_admin_idea_space on aula.idea_space;
 create policy school_admin_idea_space on aula.idea_space using (aula.is_admin(school_id) or aula.from_school(school_id)) with check (aula.is_admin(school_id));
@@ -124,6 +124,7 @@ grant execute on function aula.change_password(bigint, text, text)        to aul
 grant execute on function aula.user_listing()                       to aula_authenticator;
 
 -- Enable public school listing
+drop policy public_school_listing on aula.school;
 create policy public_school_listing on aula.school using (true);
 revoke select on aula.school from public;
 grant select (id, name) on aula.school to public;

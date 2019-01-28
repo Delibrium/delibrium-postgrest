@@ -11,6 +11,7 @@ create table if not exists aula.idea_space (
     changed_at  timestamptz not null default now(),
     title       text        not null,
     description text        not null,
+    image       text,
     slug        text
 );
 

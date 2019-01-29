@@ -14,7 +14,7 @@ drop policy if exists school_admin_idea_space on aula.idea_space;
 create policy school_admin_idea_space on aula.idea_space using (aula.is_admin(school_id) or aula.from_school(school_id)) with check (aula.is_admin(school_id));
 
 drop policy if exists school_admin_topic on aula.topic;
-create policy school_admin_topic on aula.topic using (aula.is_admin(school_id) or aula.from_school(school_id)) with check (aula.is_admin(school_id));
+create policy school_admin_topic on aula.topic using (aula.is_admin(school_id) or aula.from_school(school_id)) with check (aula.is_admin(school_id) or aula.is_moderator(school_id));
 
 drop policy if exists school_admin_feasible on aula.feasible;
 create policy school_admin_feasible on aula.feasible using (aula.is_admin(school_id) or aula.from_school(school_id)) with check (aula.is_admin(school_id));
@@ -25,7 +25,7 @@ create policy school_select_idea on aula.idea for select using (aula.is_admin(sc
 drop policy if exists school_create_idea on aula.idea;
 create policy school_create_idea on aula.idea for insert with check (aula.is_admin(school_id) or (aula.from_school(school_id)));
 drop policy if exists school_update_idea on aula.idea;
-create policy school_update_idea on aula.idea for update using (aula.is_admin(school_id) or (aula.is_owner(created_by))) with check (aula.is_admin(school_id) or (aula.is_owner(created_by)));
+create policy school_update_idea on aula.idea for update using (aula.is_admin(school_id) or (aula.is_owner(created_by)) or (aula.is_moderator(school_id))) with check (aula.is_admin(school_id) or (aula.is_owner(created_by)) or (aula.is_moderator(school_id)));
 drop policy if exists school_delete_idea on aula.idea;
 create policy school_delete_idea on aula.idea for delete using (aula.is_admin(school_id));
 

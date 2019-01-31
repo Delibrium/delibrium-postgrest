@@ -3,5 +3,6 @@ create table if not exists aula.category (
     school_id   bigint      references aula.school (id),
     name        text        not null,
     description text,
-    image       text
+    image       text,
+    def         boolean     default 'f'
 );

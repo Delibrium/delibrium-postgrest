@@ -1,4 +1,4 @@
-create or replace function aula.user_listing()
+create or replace function aula.ideas_space_user(space_id bigint)
     returns json
     language plpython3u
 as $$
@@ -12,28 +12,10 @@ as $$
 
     rv = plpy.execute("""
         select
-            us.*,
-            ul.config,
-            ul.login,
-            array_agg(row(
-                ug.group_id,
-                ug.idea_space,
-                sp.title
-            )) as groups
-        from
-            aula.users as us
-            join
-                aula_secure.user_login as ul
-                on ul.id=us.user_login_id
-            left join
-                aula.user_group as ug
-                on ug.user_id=us.id
-            left join
-                aula.idea_space as sp
-                on sp.id=ug.idea_space
-        where us.school_id={}
-        group by (us.id, ul.login, ul.config);
-    """.format(school_id))
+          id,
+          first_name,
+          picture
+          from aula.users where id in (select distinct user_id from aula.user_group  where school_id = {} and idea_space = {}) """.format(school_id, space_id))
 
     return json.dumps([user for user in rv])
 $$;

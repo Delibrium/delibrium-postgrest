@@ -6,5 +6,6 @@ create table if not exists aula.feasible (
     changed_by bigint      not null default request.user_id() references aula.users (id) references aula.users (id),
     changed_at timestamptz not null default now(),
     val        bool        not null,
+    idea       bigint      not null references aula.idea (id),
     reason     text
 );

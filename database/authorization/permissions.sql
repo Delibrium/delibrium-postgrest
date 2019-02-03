@@ -124,6 +124,7 @@ grant execute on function aula.change_password(bigint, text, text)        to aul
 grant execute on function aula.user_listing()                       to aula_authenticator;
 grant execute on function aula.get_page(bigint,text) to aula_authenticator;
 grant execute on function aula.update_page(bigint, text, text) to aula_authenticator;
+grant execute on function aula.ideas_space_user(bigint) to aula_authenticator;
 
 -- Enable public school listing
 drop policy public_school_listing on aula.school;

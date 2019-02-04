@@ -4,5 +4,6 @@ create table if not exists aula.category (
     name        text        not null,
     description text,
     image       text,
+    position    int,
     def         boolean     default 'f'
 );

@@ -36,19 +36,24 @@ if not is_admin[0]['is_admin']:
   plpy.info(is_admin)
   plpy.error('User must be admin to create users')
 
-def create_random_password():
-    try:
-        dict_location = '/usr/share/dict/words'
-        with open(dict_location) as f:
-            words = f.readlines()
-        return ".".join([random.choice(words).strip() for _ in range(2)])
-    except FileNotFoundError:
-        plpy.warning("""Place a dictionary file in {} to enable
-            word-based temp passwords""".format(dict_location))
+def create_random_password(with_dict = False):
+    def random_without_dict(size = 6):
         return  ''.join(random.choice(
             string.ascii_uppercase + string.ascii_lowercase + string.digits
-        ) for _ in range(12))
+        ) for _ in range(size))
 
+    if with_dict:
+      try:
+          dict_location = '/usr/share/dict/words'
+          with open(dict_location) as f:
+              words = f.readlines()
+          return ".".join([random.choice(words).strip() for _ in range(2)])
+      except FileNotFoundError:
+          plpy.warning("""Place a dictionary file in {} to enable
+              word-based temp passwords""".format(dict_location))
+          return random_without_dict()
+    else:
+      return random_without_dict()
 
 password = create_random_password()
 new_config = json.dumps({ "temp_password": password })

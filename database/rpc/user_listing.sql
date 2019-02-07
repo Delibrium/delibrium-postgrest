@@ -13,8 +13,6 @@ as $$
     else:
       school_id = schoolid
 
-    plpy.info('HELLL', schoolid)
-
     rv = plpy.execute("""
         select
             us.*,

@@ -1,21 +1,44 @@
-create or replace function aula.ideas_space_user(space_id bigint)
+create or replace function aula.user_listing(schoolid bigint default null)
     returns json
     language plpython3u
 as $$
     import json
 
-    res_school_id = plpy.execute("select current_setting('request.jwt.claim.school_id');")
-    if len(res_school_id) == 0:
-        plpy.error('Current user is not associated with a school.', sqlstate='PT401')
+    if not schoolid:
+      res_school_id = plpy.execute("select current_setting('request.jwt.claim.school_id');")
+      if len(res_school_id) == 0:
+          plpy.error('Current user is not associated with a school.', sqlstate='PT401')
 
-    school_id = res_school_id[0]['current_setting']
+      school_id = res_school_id[0]['current_setting']
+    else:
+      school_id = schoolid
+
+    plpy.info('HELLL', schoolid)
 
     rv = plpy.execute("""
         select
-          id,
-          first_name,
-          picture
-          from aula.users where id in (select distinct user_id from aula.user_group  where school_id = {} and idea_space = {}) """.format(school_id, space_id))
+            us.*,
+            ul.config,
+            ul.login,
+            array_agg(row(
+                ug.group_id,
+                ug.idea_space,
+                sp.title
+            )) as groups
+        from
+            aula.users as us
+            join
+                aula_secure.user_login as ul
+                on ul.id=us.user_login_id
+            left join
+                aula.user_group as ug
+                on ug.user_id=us.id
+            left join
+                aula.idea_space as sp
+                on sp.id=ug.idea_space
+        where us.school_id={}
+        group by (us.id, ul.login, ul.config);
+    """.format(school_id))
 
     return json.dumps([user for user in rv])
 $$;

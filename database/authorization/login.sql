@@ -19,11 +19,17 @@ as $$
 
   plpy.info("INFO >>", aula_user_id, session_count)
 
-
   plpy.execute('set "request.jwt.claim.user_group" TO \'admin\'')
-  rv = plpy.execute('select group_id from aula.user_group where user_id = {}'.format(aula_user_id))
+  rv = plpy.execute('select group_id,idea_space from aula.user_group where user_id = {}'.format(aula_user_id))
 
-  all_roles = [r['group_id'] for r in rv]
+  all_roles = []
+  for r in rv:
+    role = [r['group_id']]
+    space = r['idea_space']
+    if space:
+      role += [space]
+    all_roles += [role]
+
   plpy.info('set "request.jwt.claim.roles" TO \"{}\"'.format(all_roles))
   plpy.execute('set "request.jwt.claim.roles" TO \"{}\"'.format(all_roles))
 

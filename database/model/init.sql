@@ -8,8 +8,13 @@ create schema if not exists aula_secure;
 \ir phase.sql
 \ir topic.sql
 \ir category.sql
+
 \ir feasible.sql
+\ir feasible_permissions.sql
+
 \ir idea.sql
+\ir idea_permissions.sql
+
 \ir idea_like.sql
 \ir idea_vote_value.sql
 \ir idea_vote.sql

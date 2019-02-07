@@ -37,10 +37,11 @@ if not is_admin[0]['is_admin']:
   plpy.error('User must be admin to create users')
 
 def create_random_password(with_dict = False):
-    def random_without_dict(size = 6):
-        return  ''.join(random.choice(
-            string.ascii_uppercase + string.ascii_lowercase + string.digits
-        ) for _ in range(size))
+    def random_without_dict(size = 6, with_upper = False):
+        chars = string.ascii_lowercase + string.digits
+        if with_upper:
+          chars += string.ascii_uppercase
+        return  ''.join(random.choice(chars) for _ in range(size))
 
     if with_dict:
       try:

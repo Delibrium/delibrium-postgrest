@@ -18,7 +18,10 @@ create schema if not exists aula_secure;
 \ir idea_like.sql
 \ir idea_vote_value.sql
 \ir idea_vote.sql
+
 \ir comment.sql
+\ir comment_permissions.sql
+
 \ir up_down.sql
 \ir comment_vote.sql
 \ir school_class.sql

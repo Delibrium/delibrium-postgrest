@@ -47,16 +47,6 @@ drop policy if exists school_delete_idea_vote on aula.idea_vote;
 create policy school_delete_idea_vote on aula.idea_vote for delete using (aula.is_admin(school_id) or (aula.is_owner(created_by)));
 
 
--- Comment
-drop policy if exists school_select_comment on aula.comment;
-create policy school_select_comment on aula.comment for select using (aula.is_admin(school_id) or (aula.from_school(school_id)));
-drop policy if exists school_create_comment on aula.comment;
-create policy school_create_comment on aula.comment for insert with check (aula.is_admin(school_id) or (aula.from_school(school_id)));
-drop policy if exists school_update_comment on aula.comment;
-create policy school_update_comment on aula.comment for update using (aula.is_admin(school_id) or (aula.from_school(school_id))) with check (aula.is_admin(school_id) or (aula.is_owner(created_by)));
-drop policy if exists school_delete_comment on aula.comment;
-create policy school_delete_comment on aula.comment for delete using (aula.is_admin(school_id));
-
 -- Comment Vote
 drop policy if exists school_select_comment_vote on aula.comment_vote;
 create policy school_select_comment_vote on aula.comment_vote for select using (aula.is_admin(school_id) or (aula.from_school(school_id)));
@@ -116,6 +106,7 @@ grant execute on function aula.user_listing()                       to aula_auth
 grant execute on function aula.get_page(bigint,text) to aula_authenticator;
 grant execute on function aula.update_page(bigint, text, text) to aula_authenticator;
 grant execute on function aula.ideas_space_user(bigint) to aula_authenticator;
+grant execute on function aula.has_role_comment(aula.group_id, bigint, bigint) to aula_authenticator;
 
 -- Enable public school listing
 drop policy public_school_listing on aula.school;

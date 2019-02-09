@@ -1,3 +1,5 @@
+alter table aula.idea enable row level security;
+
 -- Idea
 drop policy if exists school_select_idea on aula.idea;
 create policy school_select_idea on aula.idea for select using (aula.is_admin(school_id) or (aula.from_school(school_id)));

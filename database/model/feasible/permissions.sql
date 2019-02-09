@@ -1,3 +1,5 @@
+alter table aula.feasible enable row level security;
+
 -- Idea Feasibility
 drop policy if exists school_select_feasible on aula.feasible;
 create policy school_select_feasible on aula.feasible for select using (aula.is_admin(school_id) or (aula.from_school(school_id)));
@@ -10,3 +12,4 @@ create policy school_update_feasible on aula.feasible for update using (aula.is_
 
 drop policy if exists school_delete_feasible on aula.feasible;
 create policy school_delete_feasible on aula.feasible for delete using (aula.is_admin(school_id) or aula.is_principal(school_id));
+

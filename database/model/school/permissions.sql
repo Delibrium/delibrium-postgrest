@@ -5,6 +5,6 @@ create policy
   school_admin_school
   on aula.school
   using
-    (aula.is_admin(id) or aula.from_school(school_id))
+    (aula.is_admin(id) or aula.from_school(id))
   with check
     (aula.is_admin(id));

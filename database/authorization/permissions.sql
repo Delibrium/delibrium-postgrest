@@ -26,9 +26,3 @@ grant execute on function aula.get_page(bigint,text) to aula_authenticator;
 grant execute on function aula.update_page(bigint, text, text) to aula_authenticator;
 grant execute on function aula.ideas_space_user(bigint) to aula_authenticator;
 grant execute on function aula.has_role_comment(aula.group_id, bigint, bigint) to aula_authenticator;
-
--- Enable public school listing
-drop policy public_school_listing on aula.school;
-create policy public_school_listing on aula.school using (true);
-revoke select on aula.school from public;
-grant select (id, name) on aula.school to public;

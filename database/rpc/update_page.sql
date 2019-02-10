@@ -1,8 +1,8 @@
-create or replace function aula.update_page(space_id bigint, page text, content text)
+create or replace function aula.update_page(school_id bigint, page text, content text)
   returns void
   language plpgsql
 as $$
   begin
-  update aula.school set pages = jsonb_set(pages, array_append(array[]:: text[], page), to_jsonb(content)) where id = space_id;
+  update aula.page set content = content where name = page and school_id = school_id;
   end
 $$;

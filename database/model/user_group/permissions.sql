@@ -5,5 +5,5 @@ create policy
   school_admin_user_group
   on aula.user_group
   using
-  (aula.is_admin(school_id) or aula.is_owner(user_id))
+  (aula.is_admin(school_id) or aula.is_owner(user_id) or aula.from_school(school_id))
   with check (aula.is_admin(school_id) or aula.is_owner(user_id));

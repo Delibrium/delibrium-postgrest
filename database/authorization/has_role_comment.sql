@@ -22,3 +22,5 @@ as $$
 
   return False
 $$;
+
+grant execute on function aula.has_role_comment(aula.group_id, bigint, bigint) to aula_authenticator;

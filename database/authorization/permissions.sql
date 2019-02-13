@@ -25,4 +25,4 @@ grant execute on function aula.user_listing()                       to aula_auth
 grant execute on function aula.get_page(bigint,text) to aula_authenticator;
 grant execute on function aula.update_page(bigint, text, text) to aula_authenticator;
 grant execute on function aula.ideas_space_user(bigint) to aula_authenticator;
-grant execute on function aula.has_role_comment(aula.group_id, bigint, bigint) to aula_authenticator;
+

@@ -40,3 +40,5 @@ as $$
 
     return json.dumps([user for user in rv])
 $$;
+
+grant execute on function aula.user_listing(bigint) to aula_authenticator;

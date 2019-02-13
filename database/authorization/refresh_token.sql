@@ -23,3 +23,5 @@ begin
     end if;
 end
 $$ stable security definer language plpgsql;
+
+grant execute on function aula.refresh_token()                      to aula_authenticator;

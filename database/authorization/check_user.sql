@@ -32,3 +32,5 @@ begin
   end if;
 end
 $$;
+
+grant execute on function aula_secure.check_user() to aula_authenticator;

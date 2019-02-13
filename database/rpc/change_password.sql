@@ -1,4 +1,4 @@
-create or replace function aula_secure.change_password(user_id bigint, old_password text, new_password text)
+create or replace function aula.change_password(user_id bigint, old_password text, new_password text)
    returns void
    language plpgsql
 as $$
@@ -20,3 +20,5 @@ begin
 
 end
 $$;
+
+grant execute on function aula.change_password(bigint, text, text) to aula_authenticator;

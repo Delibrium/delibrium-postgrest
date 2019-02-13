@@ -6,7 +6,6 @@
 \ir ./delete_user.sql
 \ir ./get_page.sql
 \ir ./ideas_space_user.sql
-\ir ./public_page.sql
 \ir ./quorum_info.sql
 \ir ./school_listing.sql
 \ir ./update_page.sql

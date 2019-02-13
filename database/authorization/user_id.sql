@@ -22,3 +22,5 @@ as $$
         );
   end;
 $$;
+
+grant execute on function aula_secure.user_id(bigint, text, text)   to aula_authenticator;

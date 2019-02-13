@@ -10,3 +10,5 @@ as $$
   else:
     plpy.execute('''set local "response.headers" = '[{"set-cookie": "sessiontoken=;Path=/;domain=localhost;"}]';''')
 $$;
+
+grant execute on function aula.logout() to aula_authenticator;

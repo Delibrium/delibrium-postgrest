@@ -102,3 +102,5 @@ q4 = plpy.execute(q4plan, [user['id'], user_login['id']])
 plpy.info(q4)
 $$;
 
+grant execute on function aula.add_user (text, text, text, text, aula.group_id, bigint) to aula_authenticator;
+

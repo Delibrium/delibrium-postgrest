@@ -35,3 +35,5 @@ else:
 
 return json.dumps([user for user in users])
 $$;
+
+grant execute on function aula.ideas_space_user(bigint, bigint) to aula_authenticator;

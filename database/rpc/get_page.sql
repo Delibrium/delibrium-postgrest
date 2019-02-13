@@ -9,3 +9,5 @@ declare
     return page;
   end
 $$;
+
+grant execute on function aula.get_page(bigint,text) to aula_authenticator;

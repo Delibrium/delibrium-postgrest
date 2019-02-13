@@ -8,3 +8,5 @@ create policy
     (aula.is_admin(school_id) or aula.from_school(school_id) or aula.is_owner(id))
   with check
     (aula.is_admin(school_id) or aula.is_owner(id));
+
+\ir ../secure/user_login/permissions.sql

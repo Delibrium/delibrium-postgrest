@@ -13,3 +13,5 @@ as $$
     """.format(phase=phase, topic_id=topic))
     return rv[0]['config'] if len(rv) > 0 else '{}'
 $$;
+
+grant execute on function aula.change_phase(bigint, text) to aula_authenticator;

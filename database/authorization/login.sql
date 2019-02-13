@@ -60,3 +60,5 @@ as $$
 
   return json.dumps(output)
 $$;
+
+grant execute on function aula.login(bigint, text, text) to aula_authenticator;

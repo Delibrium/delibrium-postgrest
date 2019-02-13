@@ -3,6 +3,5 @@ create table if not exists aula.school (
     created_at timestamptz   not null default now(),
     changed_at timestamptz   not null default now(),
     name       text,
-    config     jsonb default '{}',
-    pages      jsonb default '{}',
+    config     jsonb default '{}'
 );

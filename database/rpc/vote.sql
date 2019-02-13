@@ -12,7 +12,8 @@ as $$
          union
          select d.from_user from aula.delegation d
         inner join ids i on
-          d.to_user = i.from_user
+          d.to_user = i.from_user and
+          d.to_user != $1
         ) select from_user from ids""", ['bigint', 'bigint'])
 
   voters_ids = plpy.execute(get_voters_ids_plan, [user_id, topic_id])
@@ -25,6 +26,8 @@ as $$
     """, ['bigint', 'bigint', 'bigint', 'aula.idea_vote_value', 'bigint'])
   for id in voters_ids:
     plpy.execute(vote_plan, [school_id, idea_id, user_id, vote_value, id['from_user']])
+
+  plpy.execute(vote_plan, [school_id, idea_id, user_id, vote_value, user_id])
 
   return json.dumps({'status': 'vote_registered'})
 

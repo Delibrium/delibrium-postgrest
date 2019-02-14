@@ -33,7 +33,6 @@ is_admin_plan = plpy.prepare(
   )
 is_admin = plpy.execute(is_admin_plan, [school_id])
 if not is_admin[0]['is_admin']:
-  plpy.info(is_admin)
   plpy.error('User must be admin to create users')
 
 def create_random_password(with_dict = False):
@@ -63,7 +62,6 @@ q1plan = plpy.prepare("""insert
     into aula_secure.user_login (school_id, login, password, config )
     values ($1, $2, $3, $4) returning id ;""", ["bigint", "text", "text", "jsonb"])
 q1 = plpy.execute(q1plan, [school_id, username, password, new_config])
-plpy.info(q1)
 user_login = q1[0]
 
 q2plan = plpy.prepare("""insert
@@ -84,7 +82,6 @@ q2 = plpy.execute(q2plan, [ school_id,
                             first_name,
                             last_name,
                             email or ''])
-plpy.info(q2)
 user = q2[0]
 
 q3plan = plpy.prepare("""insert
@@ -95,11 +92,9 @@ q3 = plpy.execute(q3plan, [ school_id,
                             user_group,
                             idea_space or None])
 
-plpy.info(q3)
 
 q4plan = plpy.prepare("update aula_secure.user_login set aula_user_id= $1 where id= $2;", ["bigint", "bigint"])
 q4 = plpy.execute(q4plan, [user['id'], user_login['id']])
-plpy.info(q4)
 $$;
 
 grant execute on function aula.add_user (text, text, text, text, aula.group_id, bigint) to aula_authenticator;

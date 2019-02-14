@@ -1,4 +1,3 @@
--- by default all functions are accessible to the public, we need to remove that and define our specific access rules
 revoke all privileges on function aula.refresh_token() from public;
 
 grant usage on schema aula to aula_authenticator;

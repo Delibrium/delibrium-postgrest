@@ -9,5 +9,6 @@ create table if not exists aula.idea (
     description text        not null,
     category    bigint      references aula.category (id),
     idea_space  bigint      references aula.idea_space (id),  -- 'null' == 'schoolspace'
-    topic       bigint      references aula.topic (id)
+    topic       bigint      references aula.topic (id),
+    selected    boolean     default 'f'
 );

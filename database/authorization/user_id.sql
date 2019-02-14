@@ -20,6 +20,8 @@ as $$
           user_id.password,
           aula_secure.user_login.password
         );
+
+    set "request.jwt.claim.user_group" TO '';
   end;
 $$;
 

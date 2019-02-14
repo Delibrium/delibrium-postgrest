@@ -23,7 +23,6 @@ as $$
         comments = plpy.execute('select id from aula.comment where parent_idea = {}'.format(idea['id']))
         for comment in comments:
           plpy.execute('delete from aula.comment_vote where comment = {}'.format(comment['id']))
-          plpy.info('delete from aula.comment_vote where comment = {}'.format(comment['id']))
         plpy.execute('delete from aula.comment where parent_idea = {}'.format(idea['id']))
         # Delete idea votes
         plpy.execute('delete from aula.idea_vote where idea = {}'.format(idea['id']))
@@ -33,7 +32,6 @@ as $$
         plpy.execute('delete from aula.feasible where idea = {}'.format(idea['id']))
         # Delete idea
         plpy.execute('delete from aula.idea where id = {}'.format(idea['id']))
-      plpy.info('delete from aula.idea where idea_space = {}'.format(space_id))
 
       # Delete topics
       topics = plpy.execute('select id from aula.topic where idea_space = {}'.format(space_id))

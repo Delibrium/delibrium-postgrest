@@ -3,7 +3,9 @@ declare
   usr record;
   token text;
 begin
-    raise info 'TOKEN %', current_setting('request.jwt', true);
+    if current_setting('app.debug') then
+      raise info 'TOKEN %', current_setting('request.jwt', true);
+    end if;
 
     EXECUTE format(
     ' select row_to_json(u.*) as j'

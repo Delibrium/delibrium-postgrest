@@ -8,7 +8,6 @@ as $$
 
   rv = plpy.execute('select * from aula_secure.user_id(\'{}\', \'{}\', \'{}\')'.format(school_id, username, password))
   plpy.execute('set "request.jwt.claim.user_group" TO \'\'')
-  plpy.info(rv)
 
   if rv:
     aula_user_id = int(rv[0]['uid'])
@@ -16,8 +15,6 @@ as $$
   else:
     plpy.error('authentication failed', sqlstate='PT401')
     return 'authentication failed'
-
-  plpy.info("INFO >>", aula_user_id, session_count)
 
   plpy.execute('set "request.jwt.claim.user_group" TO \'admin\'')
   rv = plpy.execute('select group_id,idea_space from aula.user_group where user_id = {}'.format(aula_user_id))
@@ -30,12 +27,10 @@ as $$
       role += [space]
     all_roles += [role]
 
-  plpy.info('set "request.jwt.claim.roles" TO \"{}\"'.format(all_roles))
   plpy.execute('set "request.jwt.claim.roles" TO \"{}\"'.format(all_roles))
 
   group_id = rv[0]['group_id']
   plpy.execute('set "request.jwt.claim.user_group" TO \'{}\''.format(group_id))
-  plpy.info(school_id)
 
   token = {
     'user_group': group_id,

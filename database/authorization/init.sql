@@ -14,5 +14,3 @@
 \ir check_user.sql
 \ir refresh_token.sql
 \ir user_id.sql
-\ir permissions.sql
-\ir db_access.sql

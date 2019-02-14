@@ -7,7 +7,7 @@ as $$
   res = plpy.execute("select current_setting('request.jwt.claim.roles', true);")
 
   roles = json.loads(res[0]['current_setting'])
-  plpy.info(roles)
+
   for r in roles:
     if len(r) == 2:
       if role == r[0] and r[1] == space_id:

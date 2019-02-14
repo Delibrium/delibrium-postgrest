@@ -7,11 +7,13 @@ create extension if not exists pgjwt;
 create schema if not exists aula;
 create schema if not exists aula_secure;
 
+\ir config.sql
 \ir types/init.sql
 \ir libs/init.sql
 \ir authorization/init.sql
 \ir model/init.sql
 \ir rpc/init.sql
+\ir authorization/permissions.sql
 
 -- Create initial data
 

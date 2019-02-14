@@ -5,14 +5,11 @@ as $$
 
 import json
 
-plpy.info ('INFO SCHOOL', schoolid, spaceid)
-
 if schoolid is None:
   res_school_id = plpy.execute("select current_setting('request.jwt.claim.school_id');")
   if len(res_school_id) == 0:
       plpy.error('Current user is not associated with a school.', sqlstate='PT401')
   school_id = res_school_id[0]['current_setting']
-  plpy.info('NOW THE ID IS', school_id)
 else:
   school_id = schoolid
 

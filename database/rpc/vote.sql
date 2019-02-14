@@ -25,11 +25,8 @@ as $$
     do update set val = $4
     """, ['bigint', 'bigint', 'bigint', 'aula.idea_vote_value', 'bigint'])
   for id in voters_ids:
-    plpy.info('VOTE => ', [school_id, idea_id, user_id, vote_value, id['from_user']])
     plpy.execute(vote_plan, [school_id, idea_id, user_id, vote_value, id['from_user']])
 
-
-  plpy.info('VOTE => ', [school_id, idea_id, user_id, vote_value, user_id])
   plpy.execute(vote_plan, [school_id, idea_id, user_id, vote_value, user_id])
 
   return json.dumps({'status': 'vote_registered'})

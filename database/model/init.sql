@@ -5,6 +5,7 @@ create schema if not exists aula_secure;
 \ir secure/user_login/init.sql
 \ir user/init.sql
 \ir idea_space/init.sql
+\ir page/init.sql
 \ir topic/init.sql
 \ir category/init.sql
 \ir idea/init.sql

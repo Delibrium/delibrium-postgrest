@@ -1,0 +1,2 @@
+id,created_at,changed_at,name,config,created_by
+1,2019-02-14 21:00:13.581954+01,2019-02-14 21:02:41.714535+01,aula,"{""classQuorum"": ""30"", ""phaseVoting"": ""1"", ""phaseWorking"": ""1"", ""schoolQuorum"": ""30"", ""mainSpaceName"": ""Schule""}",

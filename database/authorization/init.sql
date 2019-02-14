@@ -13,4 +13,5 @@
 \ir me.sql
 \ir check_user.sql
 \ir refresh_token.sql
+\ir reset_password.sql
 \ir user_id.sql

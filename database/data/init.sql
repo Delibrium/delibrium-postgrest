@@ -17,7 +17,7 @@ insert into aula.users (school_id, user_login_id, first_name, last_name, changed
 insert into aula.user_group (school_id, user_id, group_id) values(1, 2, 'student');
 
 -- Insert Class
-insert into aula.idea_space (school_id, created_by, changed_by, title, description, slug) values (1,1,1,'Klass', 'Test Klass', 'Test Klass');
+insert into aula.idea_space (school_id, created_by, changed_by, title, description, slug) values (1,1,1,'Klass', 'Test Klass', 'test-klass');
 
 -- Import categories
 copy aula.category (id,school_id, name, description, image,def,position) from :categories_path with (delimiter ',', format csv, quote '"', header true);

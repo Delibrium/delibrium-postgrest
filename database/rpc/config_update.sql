@@ -3,6 +3,6 @@ create or replace function aula.config_update(space_id bigint, key text, value t
   language plpgsql
 as $$
   begin
-  update aula.school set config = jsonb_set(config, array_append(array[]:: text[], key), to_jsonb(value)) where id = space_id;
+  update aula.school set config = jsonb_set(config, array_append(array[]:: text[], key), cast(value as jsonb)) where id = space_id;
   end
 $$;

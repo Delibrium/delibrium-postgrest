@@ -12,3 +12,4 @@
 \ir ./update_user.sql
 \ir ./user_listing.sql
 \ir ./vote.sql
+\ir ./delete_vote.sql

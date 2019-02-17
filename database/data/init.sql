@@ -23,4 +23,4 @@ insert into aula.idea_space (school_id, created_by, changed_by, title, descripti
 copy aula.category (id,school_id, name, description, image,def,position) from :categories_path with (delimiter ',', format csv, quote '"', header true);
 
 -- Import pages
-copy aula.page (id,created_by, created_at,changed_by, school_id, name, public,content,config) from :pages_path with (delimiter ',', format csv, quote '"', header true);
+copy aula.page (id,created_by, created_at,changed_by, changed_at,school_id, name, public,content,config) from :pages_path with (delimiter ',', format csv, quote '"', header true);

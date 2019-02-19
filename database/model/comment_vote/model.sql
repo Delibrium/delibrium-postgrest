@@ -5,5 +5,6 @@ create table if not exists aula.comment_vote (
     created_at timestamptz      not null default now(),
     changed_by bigint           not null default request.user_id() references aula.users (id) references aula.users (id),
     changed_at timestamptz      not null default now(),
-    val        aula.up_down     not null
+    val        aula.up_down     not null,
+    unique (created_by, comment)
 );

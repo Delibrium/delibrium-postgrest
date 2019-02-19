@@ -4,5 +4,6 @@ create table if not exists aula.school (
     changed_at timestamptz   not null default now(),
     name       text,
     config     jsonb         default '{}',
-    image      text,         default ''
+    image      text,         default '',
+    imagecontain boolean     default 'f'
 );

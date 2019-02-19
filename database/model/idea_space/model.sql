@@ -12,6 +12,7 @@ create table if not exists aula.idea_space (
     title       text        not null,
     description text        not null,
     image       text,
+    imagecontain boolean    default 'f',
     slug        text
 );
 

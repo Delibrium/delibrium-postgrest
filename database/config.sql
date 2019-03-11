@@ -1,5 +1,8 @@
 \set db_user aula
 \set db_name aula
+
+create role  :db_user;
+
 \set jwt_secret 'Xh3d3SeWWQTn85sDZ8ytKmtS36HJtEhJ'
 \set quoted_jwt_secret '\'' :jwt_secret '\''
 

@@ -6,7 +6,7 @@ as $$
 
     plpy.execute('set "request.jwt.claim.user_group" TO \'admin\'')
 
-    result = plpy.execute("select id, name from aula.school;")
+    result = plpy.execute("select id, name from aula.school order by name;")
     rv = [{
         "text": elem['name'],
         "value": elem['id']

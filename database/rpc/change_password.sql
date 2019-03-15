@@ -9,7 +9,7 @@ begin
     update aula_secure.user_login
       set password = new_password, config = config #- '{temp_password}'
       where
-        id = user_id
+        aula_user_id = user_id
         and
         password = crypt(old_password, password) returning 1)
   select count(*) from row_changes into changes_num;

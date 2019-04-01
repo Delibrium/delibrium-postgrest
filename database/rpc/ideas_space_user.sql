@@ -16,18 +16,20 @@ else:
 if spaceid:
   users_plan = plpy.prepare("""
       select
-        id,
-        first_name,
-        picture
-        from aula.users where id in (select distinct user_id from aula.user_group  where school_id = $1 and idea_space = $2) """, ['bigint', 'bigint'])
+        aula.users.id,
+        aula_secure.user_login.login,
+        aula.users.picture
+        from aula.users join aula_secure.user_login on aula_secure.user_login.aula_user_id = aula.users.id
+        where aula.users.id in (select distinct user_id from aula.user_group  where school_id = $1 and idea_space = $2 and aula.users.config->'deleted' is null) """, ['bigint', 'bigint'])
   users = plpy.execute(users_plan, [school_id, spaceid])
 else:
   users_plan = plpy.prepare("""
       select
-        id,
-        first_name,
-        picture
-        from aula.users where id in (select distinct user_id from aula.user_group  where school_id = $1) """, ['bigint'])
+        aula.users.id,
+        aula_secure.user_login.login,
+        aula.users.picture
+        from aula.users join aula_secure.user_login on aula_secure.user_login.aula_user_id = aula.users.id
+        where aula.users.id in (select distinct user_id from aula.user_group  where school_id = $1 and aula.users.config->'deleted' is null) """, ['bigint', 'bigint'])
   users = plpy.execute(users_plan, [school_id])
 
 return json.dumps([user for user in users])

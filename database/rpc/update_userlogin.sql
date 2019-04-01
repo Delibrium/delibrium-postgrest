@@ -1,10 +1,10 @@
-create or replace function aula.update_user(
-    id bigint,
-    first_name text,
-    last_name text,
-    email text default null
-) returns void language plpython3u
+create or replace function aula.update_userlogin(
+    user_id bigint,
+    username text
+) returns json language plpython3u
 as $$
+
+import json
 
 # Get school id from JWT
 res_school_id = plpy.execute(
@@ -30,24 +30,14 @@ is_admin = plpy.execute(is_admin_plan, [school_id])
 if not is_admin[0]['is_admin']:
   plpy.error('User must be admin to create users')
 
-q = """update
-aula.users set
-    first_name='{}',
-    last_name='{}',
-    email='{}',
-    changed_by='{}',
-    changed_at=now()
-where
-    id='{}'
-returning user_login_id;""".format(
-    first_name,
-    last_name,
-    email or '',
-    calling_user_id,
-    id
-)
-res = plpy.execute(q)
-login_id = res[0]['user_login_id']
+q = plpy.prepare("""select id from aula_secure.user_login where login = $1 and school_id = $2;""", ["text", "bigint"])
+res = plpy.execute(q, [username, school_id])
+
+if len(res) > 0:
+  plpy.error(detail='Username exists', sqlstate='PT500')
+else:
+  q = plpy.prepare("""update aula_secure.user_login set login = $1 where school_id = $2 and id = $3;""", ["text", "bigint", "bigint"])
+  res = plpy.execute(q, [username, school_id, user_id])
+  return json.dumps({'status': 'username updated'})
 
 $$;
-

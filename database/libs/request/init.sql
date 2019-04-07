@@ -8,4 +8,4 @@ grant usage on schema request to aula_authenticator;
 \ir header.sql
 \ir user_id.sql
 \ir school_id.sql
-\ir role.sql
+\ir user_role.sql

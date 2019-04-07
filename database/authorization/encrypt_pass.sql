@@ -1,5 +1,5 @@
 create extension if not exists pgcrypto;
-create extension if not exists pgjwt;
+-- create extension if not exists pgjwt;
 
 create or replace function aula_secure.encrypt_pass() returns trigger
   language plpgsql

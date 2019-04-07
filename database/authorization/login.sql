@@ -42,7 +42,7 @@ as $$
     'exp': int(time.time()) + 60*60*24*31
   }
 
-  rv = plpy.execute('''select sign(
+  rv = plpy.execute('''select pgjwt.sign(
        '{}', current_setting('app.jwt_secret')
        ) as token'''.format(json.dumps(token)))
 

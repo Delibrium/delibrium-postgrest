@@ -12,11 +12,13 @@ create table if not exists aula.users (
     user_login_id bigint references aula_secure.user_login (id),
     first_name    text              not null,
     last_name     text              not null,
+    username      text          not null,
     config        jsonb             default '{}',
     picture       text,
     email         text
 );
 
+alter table aula.users add constraint unique_username unique (school_id, username);
 alter table aula.school add column created_by bigint references aula.users (id);
 alter table aula_secure.user_login add column aula_user_id bigint references aula.users (id) on delete cascade;
 alter table aula_secure.user_login add column created_by bigint references aula.users (id);

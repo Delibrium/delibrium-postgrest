@@ -15,7 +15,7 @@ as $$
       where
         aula.users.user_login_id = aula_secure.user_login.id
         and aula.users.school_id = user_id.school_id
-        and aula_secure.user_login.login = user_id.username
+        and aula.users.username = user_id.username
         and aula_secure.user_login.password = crypt(
           user_id.password,
           aula_secure.user_login.password

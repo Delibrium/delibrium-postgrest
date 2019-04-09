@@ -17,7 +17,6 @@ as $$
         select
             us.*,
             ul.config,
-            ul.login,
             array_agg(row(
                 ug.group_id,
                 ug.idea_space,
@@ -35,7 +34,7 @@ as $$
                 aula.idea_space as sp
                 on sp.id=ug.idea_space
         where us.school_id={}
-        group by (us.id, ul.login, ul.config);
+        group by (us.id, us.username, ul.config);
     """.format(school_id))
 
     return json.dumps([user for user in rv])

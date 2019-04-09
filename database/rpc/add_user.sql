@@ -72,16 +72,18 @@ q2plan = plpy.prepare("""insert
         user_login_id,
         first_name,
         last_name,
-        email
-    ) values ( $1, $2, $3, $4, $5, $6, $7) returning id;
-    """, ["bigint", "bigint", "bigint", "bigint", "text", "text", "text"])
+        email,
+        username
+    ) values ( $1, $2, $3, $4, $5, $6, $7, $8) returning id;
+    """, ["bigint", "bigint", "bigint", "bigint", "text", "text", "text", "text"])
 q2 = plpy.execute(q2plan, [ school_id,
                             calling_user_id,
                             calling_user_id,
                             user_login['id'],
                             first_name,
                             last_name,
-                            email or ''])
+                            email or '',
+                            username])
 user = q2[0]
 
 q3plan = plpy.prepare("""insert

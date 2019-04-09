@@ -13,6 +13,7 @@ begin
           user_login_id = null,
           first_name = 'deleted',
           last_name = 'user',
+          username = 'deleted-' || id,
           config = json_build_object('deleted', to_jsonb('t'::boolean)),
           email = '',
           picture = ''

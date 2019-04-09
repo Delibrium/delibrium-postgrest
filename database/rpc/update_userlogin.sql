@@ -30,13 +30,13 @@ is_admin = plpy.execute(is_admin_plan, [school_id])
 if not is_admin[0]['is_admin']:
   plpy.error('User must be admin to create users')
 
-q = plpy.prepare("""select id from aula_secure.user_login where login = $1 and school_id = $2;""", ["text", "bigint"])
+q = plpy.prepare("""select id from aula.users where username = $1 and school_id = $2;""", ["text", "bigint"])
 res = plpy.execute(q, [username, school_id])
 
 if len(res) > 0:
   plpy.error(detail='Username exists', sqlstate='PT500')
 else:
-  q = plpy.prepare("""update aula_secure.user_login set login = $1 where school_id = $2 and id = $3;""", ["text", "bigint", "bigint"])
+  q = plpy.prepare("""update aula.users set username = $1 where school_id = $2 and id = $3;""", ["text", "bigint", "bigint"])
   res = plpy.execute(q, [username, school_id, user_id])
   return json.dumps({'status': 'username updated'})
 

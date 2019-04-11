@@ -48,3 +48,13 @@ services:
       - PGRST_PRE_REQUEST=${PRE_REQUEST}
       - PGRST_SERVER_PROXY_URI=${SERVER_PROXY_URI}
 
+  nginx:
+    image: nginx
+    links:
+      - postgrest:postgrest
+    ports:
+      - "8082:80"
+    volumes:
+      - ./aula.conf:/etc/nginx/conf.d/aula.conf
+      - ./www:/usr/share/nginx/html
+    command: /bin/bash -c "cat /etc/nginx/conf.d/aula.conf > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"

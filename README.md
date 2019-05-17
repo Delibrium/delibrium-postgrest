@@ -1,28 +1,15 @@
-1. Create the user that is going to be the owner of the database
+The easiest way to run Aula is using [Docker Compose](https://docs.docker.com/compose/) following the steps:
 
-> $ createuser aula
+1. Download the latest release from Aula: https://releases.aula.de/latest.tar.bz2
 
-2. Create the database
+2. Uncrompress the downloaded file on step 1 inside this repository folder.
 
-> $ createdb aula -O aula
+> $ tar xjvf latest.tar.bz2
 
-3. Set the user password on Postgres:
+This will create a www/ folder.
 
-> $ psql
-> $ postgres=# alter user aula with password 'pass'
+3. Run docker-compose command inside this repository folder:
 
-4. Create the database schema
+> $ docker-compose up
 
-> $ psql aula -f aula.schema.sql
-
-5. Edit the last lines of permissions.sql according to the comments
-
-6. Configure the permissions on the tables:
-
-> $ psql aula -f permissions.sql
-
-7. Edit aula.conf accoring to your database name, user, password and jwt secret (the same used on permissions)
-
-8. Start postgrest using your configuration file:
-
-> $ postgrest aula.conf
+4. Access your local instance of Aula opening your browser at http://localhost:8082. You can select the school aula, username 'admin' with password 'password'.

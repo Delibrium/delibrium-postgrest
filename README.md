@@ -12,3 +12,4 @@ This will create a www/ folder.
 
 > $ docker-compose up
 
+4. Access your local instance of Aula opening your browser at http://localhost:8082. You can select the school aula, username 'admin' with password 'password'.

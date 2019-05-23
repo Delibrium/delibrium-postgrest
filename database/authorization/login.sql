@@ -48,7 +48,7 @@ as $$
 
   token = rv[0]['token']
 
-  plpy.execute('set local "response.headers" = \'[{{"Authorization": "Bearer {}"}}, {{"access-control-allow-origin": "*"}}]\''.format(token, token))
+  plpy.execute('set local "response.headers" = \'[{{"Authorization": "Bearer {}"}}]\''.format(token, token))
 
   user_data = {'role': group_id, 'school_id': school_id, 'user_id': aula_user_id }
   output = {'status': 'success', 'data': user_data}

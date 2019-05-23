@@ -5,6 +5,6 @@ create policy
   page_admin
   on aula.page
   using
-    ((public = true) or aula.is_admin(id) or aula.from_school(id))
+    ((public = true) or aula.is_admin(school_id) or aula.from_school(school_id))
   with check
-    (aula.is_admin(id));
+    (aula.is_admin(school_id));

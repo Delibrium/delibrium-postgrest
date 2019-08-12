@@ -3,6 +3,7 @@ create extension if not exists pgcrypto;
 
 create or replace function aula_secure.encrypt_pass() returns trigger
   language plpgsql
+  set search_path = public, aula
   as $$
 begin
   if tg_op = 'INSERT' or new.password <> old.password then

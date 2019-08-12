@@ -4,12 +4,15 @@ create or replace function aula.add_user (
     username text,
     email text default null,
     user_group aula.group_id default 'student',
-    idea_space bigint default null
+    idea_space bigint default null,
+    school bigint default null
   ) returns void language plpython3u
 as $$
 import json
 import random
 import string
+
+plpy.info('USERNAME', username, school)
 
 # Get school id from JWT
 res_school_id = plpy.execute(
@@ -17,7 +20,7 @@ res_school_id = plpy.execute(
 )
 if len(res_school_id) == 0:
     plpy.error('Current user is not associated with a school.', sqlstate='PT401')
-school_id = res_school_id[0]['current_setting']
+admin_school_id = res_school_id[0]['current_setting']
 
 # Get User id
 res_calling_user_id = plpy.execute(
@@ -31,9 +34,14 @@ calling_user_id = res_calling_user_id[0]['current_setting']
 is_admin_plan = plpy.prepare(
     "select aula.is_admin($1);", ["bigint"]
   )
-is_admin = plpy.execute(is_admin_plan, [school_id])
+is_admin = plpy.execute(is_admin_plan, [school])
 if not is_admin[0]['is_admin']:
   plpy.error('User must be admin to create users')
+
+if not school:
+  school_id = admin_school_id
+else:
+  school_id = school
 
 def create_random_password(with_dict = False):
     def random_without_dict(size = 6, with_upper = False):
@@ -99,5 +107,5 @@ q4plan = plpy.prepare("update aula_secure.user_login set aula_user_id= $1 where 
 q4 = plpy.execute(q4plan, [user['id'], user_login['id']])
 $$;
 
-grant execute on function aula.add_user (text, text, text, text, aula.group_id, bigint) to aula_authenticator;
+grant execute on function aula.add_user (text, text, text, text, aula.group_id, bigint, bigint) to aula_authenticator;
 

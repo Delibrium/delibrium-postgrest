@@ -16,6 +16,10 @@ create policy school_create_idea on aula.idea for insert with check (
     or
     ((aula.from_space('student', idea_space)) and
       (created_by = request.user_id()))
+    or
+    (aula.has_role('moderator', null))
+    or
+    (aula.from_space('moderator', idea_space))
   )
 );
 

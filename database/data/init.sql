@@ -8,11 +8,13 @@ copy aula.school (id,created_at, changed_at, name, config, created_by) from :sch
 -- Insert admin user
 insert into aula_secure.user_login (school_id, login, password) values ( 1, 'admin', 'password');
 insert into aula.users (school_id, user_login_id, first_name, last_name, changed_by, username) values (1, 1, 'Admin', 'aula', 1, 'admin');
+update aula_secure.user_login set aula_user_id = 1 where id = 1;
 insert into aula.user_group (school_id, user_id, group_id) values(1, 1, 'admin');
 
 -- Insert student
 insert into aula_secure.user_login (school_id, login, password) values ( 1, 'student', 'password');
 insert into aula.users (school_id, user_login_id, first_name, last_name, username, changed_by) values (1, 2, 'Student', 'Example', 'student', 1);
+update aula_secure.user_login set aula_user_id = 2 where id = 2;
 insert into aula.user_group (school_id, user_id, group_id) values(1, 2, 'student');
 
 -- Insert Class
